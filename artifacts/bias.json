@@ -1,0 +1,1371 @@
+{
+  "seasons": [
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+  ],
+  "comparisons": 12155,
+  "by_conference": {
+    "AP Top 25": [
+      {
+        "key": "Conference USA",
+        "n": 33,
+        "mean_gap": 16.12121212121212,
+        "median_gap": 21.0,
+        "above_range": 0.21212121212121213,
+        "below_range": 0.0
+      },
+      {
+        "key": "Mountain West",
+        "n": 114,
+        "mean_gap": 15.929824561403509,
+        "median_gap": 16.0,
+        "above_range": 0.21929824561403508,
+        "below_range": 0.0
+      },
+      {
+        "key": "Sun Belt",
+        "n": 69,
+        "mean_gap": 14.217391304347826,
+        "median_gap": 12.0,
+        "above_range": 0.2028985507246377,
+        "below_range": 0.0
+      },
+      {
+        "key": "American Athletic",
+        "n": 291,
+        "mean_gap": 12.549828178694158,
+        "median_gap": 10.0,
+        "above_range": 0.16838487972508592,
+        "below_range": 0.0
+      },
+      {
+        "key": "Mid-American",
+        "n": 24,
+        "mean_gap": 12.041666666666666,
+        "median_gap": 9.0,
+        "above_range": 0.16666666666666666,
+        "below_range": 0.0
+      },
+      {
+        "key": "Independent",
+        "n": 218,
+        "mean_gap": 7.022935779816514,
+        "median_gap": 4.0,
+        "above_range": 0.1559633027522936,
+        "below_range": 0.0
+      },
+      {
+        "key": "Pac-12",
+        "n": 626,
+        "mean_gap": 6.536741214057508,
+        "median_gap": 4.0,
+        "above_range": 0.08146964856230032,
+        "below_range": 0.0
+      },
+      {
+        "key": "ACC",
+        "n": 710,
+        "mean_gap": 6.169014084507042,
+        "median_gap": 4.0,
+        "above_range": 0.10422535211267606,
+        "below_range": 0.0
+      },
+      {
+        "key": "Big 12",
+        "n": 747,
+        "mean_gap": 3.0200803212851404,
+        "median_gap": 2.0,
+        "above_range": 0.029451137884872823,
+        "below_range": 0.006693440428380187
+      },
+      {
+        "key": "Big Ten",
+        "n": 973,
+        "mean_gap": 1.2744090441932168,
+        "median_gap": 0.0,
+        "above_range": 0.03905447070914697,
+        "below_range": 0.0010277492291880781
+      },
+      {
+        "key": "SEC",
+        "n": 1348,
+        "mean_gap": 1.077893175074184,
+        "median_gap": 0.0,
+        "above_range": 0.02744807121661721,
+        "below_range": 0.001483679525222552
+      }
+    ],
+    "Coaches Poll": [
+      {
+        "key": "Conference USA",
+        "n": 29,
+        "mean_gap": 15.793103448275861,
+        "median_gap": 20.0,
+        "above_range": 0.1724137931034483,
+        "below_range": 0.0
+      },
+      {
+        "key": "Mountain West",
+        "n": 114,
+        "mean_gap": 14.5,
+        "median_gap": 15.0,
+        "above_range": 0.19298245614035087,
+        "below_range": 0.0
+      },
+      {
+        "key": "Sun Belt",
+        "n": 64,
+        "mean_gap": 12.90625,
+        "median_gap": 10.0,
+        "above_range": 0.125,
+        "below_range": 0.0
+      },
+      {
+        "key": "American Athletic",
+        "n": 290,
+        "mean_gap": 12.682758620689656,
+        "median_gap": 11.0,
+        "above_range": 0.18275862068965518,
+        "below_range": 0.0
+      },
+      {
+        "key": "Pac-12",
+        "n": 621,
+        "mean_gap": 6.449275362318841,
+        "median_gap": 4.0,
+        "above_range": 0.08051529790660225,
+        "below_range": 0.0
+      },
+      {
+        "key": "Independent",
+        "n": 212,
+        "mean_gap": 6.44811320754717,
+        "median_gap": 3.0,
+        "above_range": 0.14622641509433962,
+        "below_range": 0.0
+      },
+      {
+        "key": "ACC",
+        "n": 722,
+        "mean_gap": 6.321329639889196,
+        "median_gap": 4.0,
+        "above_range": 0.1038781163434903,
+        "below_range": 0.0
+      },
+      {
+        "key": "Big 12",
+        "n": 747,
+        "mean_gap": 2.9089692101740297,
+        "median_gap": 2.0,
+        "above_range": 0.03748326639892905,
+        "below_range": 0.00535475234270415
+      },
+      {
+        "key": "Big Ten",
+        "n": 985,
+        "mean_gap": 1.4192893401015227,
+        "median_gap": 0.0,
+        "above_range": 0.0416243654822335,
+        "below_range": 0.0020304568527918783
+      },
+      {
+        "key": "SEC",
+        "n": 1351,
+        "mean_gap": 1.3264248704663213,
+        "median_gap": 0.0,
+        "above_range": 0.02442635085122132,
+        "below_range": 0.0014803849000740192
+      }
+    ],
+    "Playoff Committee Rankings": [
+      {
+        "key": "Mountain West",
+        "n": 47,
+        "mean_gap": 16.085106382978722,
+        "median_gap": 17.0,
+        "above_range": 0.2553191489361702,
+        "below_range": 0.0
+      },
+      {
+        "key": "American Athletic",
+        "n": 117,
+        "mean_gap": 10.025641025641026,
+        "median_gap": 7.0,
+        "above_range": 0.10256410256410256,
+        "below_range": 0.0
+      },
+      {
+        "key": "ACC",
+        "n": 265,
+        "mean_gap": 6.064150943396227,
+        "median_gap": 3.0,
+        "above_range": 0.14339622641509434,
+        "below_range": 0.0
+      },
+      {
+        "key": "Pac-12",
+        "n": 241,
+        "mean_gap": 5.439834024896266,
+        "median_gap": 5.0,
+        "above_range": 0.08713692946058091,
+        "below_range": 0.0
+      },
+      {
+        "key": "Big Ten",
+        "n": 347,
+        "mean_gap": 1.8328530259365994,
+        "median_gap": 0.0,
+        "above_range": 0.08069164265129683,
+        "below_range": 0.002881844380403458
+      },
+      {
+        "key": "Big 12",
+        "n": 281,
+        "mean_gap": 1.5053380782918149,
+        "median_gap": 1.0,
+        "above_range": 0.028469750889679714,
+        "below_range": 0.021352313167259787
+      },
+      {
+        "key": "Independent",
+        "n": 68,
+        "mean_gap": 1.2941176470588236,
+        "median_gap": 0.0,
+        "above_range": 0.08823529411764706,
+        "below_range": 0.0
+      },
+      {
+        "key": "SEC",
+        "n": 447,
+        "mean_gap": 0.9865771812080537,
+        "median_gap": 0.0,
+        "above_range": 0.03355704697986577,
+        "below_range": 0.0022371364653243847
+      }
+    ]
+  },
+  "anchoring": [
+    [
+      "preseason 1-5",
+      [
+        [
+          1,
+          {
+            "key": "preseason 1-5",
+            "n": 65,
+            "mean_gap": 2.4307692307692306,
+            "median_gap": 1.0,
+            "above_range": 0.015384615384615385,
+            "below_range": 0.0
+          }
+        ],
+        [
+          2,
+          {
+            "key": "preseason 1-5",
+            "n": 60,
+            "mean_gap": 1.8833333333333333,
+            "median_gap": 1.0,
+            "above_range": 0.016666666666666666,
+            "below_range": 0.0
+          }
+        ],
+        [
+          3,
+          {
+            "key": "preseason 1-5",
+            "n": 63,
+            "mean_gap": 2.492063492063492,
+            "median_gap": 1.0,
+            "above_range": 0.031746031746031744,
+            "below_range": 0.0
+          }
+        ],
+        [
+          4,
+          {
+            "key": "preseason 1-5",
+            "n": 62,
+            "mean_gap": 1.0161290322580645,
+            "median_gap": 1.0,
+            "above_range": 0.08064516129032258,
+            "below_range": 0.0
+          }
+        ],
+        [
+          5,
+          {
+            "key": "preseason 1-5",
+            "n": 60,
+            "mean_gap": 0.5,
+            "median_gap": 0.0,
+            "above_range": 0.08333333333333333,
+            "below_range": 0.0
+          }
+        ],
+        [
+          6,
+          {
+            "key": "preseason 1-5",
+            "n": 59,
+            "mean_gap": 0.06779661016949153,
+            "median_gap": 0.0,
+            "above_range": 0.03389830508474576,
+            "below_range": 0.0
+          }
+        ],
+        [
+          7,
+          {
+            "key": "preseason 1-5",
+            "n": 56,
+            "mean_gap": -0.017857142857142856,
+            "median_gap": 0.0,
+            "above_range": 0.017857142857142856,
+            "below_range": 0.0
+          }
+        ],
+        [
+          8,
+          {
+            "key": "preseason 1-5",
+            "n": 58,
+            "mean_gap": -1.0517241379310345,
+            "median_gap": 0.0,
+            "above_range": 0.0,
+            "below_range": 0.0
+          }
+        ],
+        [
+          9,
+          {
+            "key": "preseason 1-5",
+            "n": 59,
+            "mean_gap": -0.9661016949152542,
+            "median_gap": -1.0,
+            "above_range": 0.05084745762711865,
+            "below_range": 0.0
+          }
+        ],
+        [
+          10,
+          {
+            "key": "preseason 1-5",
+            "n": 58,
+            "mean_gap": -0.7068965517241379,
+            "median_gap": -1.0,
+            "above_range": 0.05172413793103448,
+            "below_range": 0.0
+          }
+        ],
+        [
+          11,
+          {
+            "key": "preseason 1-5",
+            "n": 55,
+            "mean_gap": -0.9272727272727272,
+            "median_gap": 0.0,
+            "above_range": 0.03636363636363636,
+            "below_range": 0.0
+          }
+        ],
+        [
+          12,
+          {
+            "key": "preseason 1-5",
+            "n": 54,
+            "mean_gap": -0.4074074074074074,
+            "median_gap": 0.0,
+            "above_range": 0.037037037037037035,
+            "below_range": 0.0
+          }
+        ],
+        [
+          13,
+          {
+            "key": "preseason 1-5",
+            "n": 55,
+            "mean_gap": -0.5272727272727272,
+            "median_gap": 0.0,
+            "above_range": 0.03636363636363636,
+            "below_range": 0.0
+          }
+        ],
+        [
+          14,
+          {
+            "key": "preseason 1-5",
+            "n": 56,
+            "mean_gap": -0.375,
+            "median_gap": 0.0,
+            "above_range": 0.03571428571428571,
+            "below_range": 0.0
+          }
+        ],
+        [
+          15,
+          {
+            "key": "preseason 1-5",
+            "n": 56,
+            "mean_gap": -0.35714285714285715,
+            "median_gap": 0.0,
+            "above_range": 0.05357142857142857,
+            "below_range": 0.0
+          }
+        ],
+        [
+          16,
+          {
+            "key": "preseason 1-5",
+            "n": 22,
+            "mean_gap": 0.36363636363636365,
+            "median_gap": -1.0,
+            "above_range": 0.09090909090909091,
+            "below_range": 0.0
+          }
+        ]
+      ]
+    ],
+    [
+      "preseason 6-10",
+      [
+        [
+          1,
+          {
+            "key": "preseason 6-10",
+            "n": 65,
+            "mean_gap": 3.6,
+            "median_gap": 0.0,
+            "above_range": 0.0,
+            "below_range": 0.0
+          }
+        ],
+        [
+          2,
+          {
+            "key": "preseason 6-10",
+            "n": 59,
+            "mean_gap": 2.2033898305084745,
+            "median_gap": 0.0,
+            "above_range": 0.01694915254237288,
+            "below_range": 0.0
+          }
+        ],
+        [
+          3,
+          {
+            "key": "preseason 6-10",
+            "n": 61,
+            "mean_gap": 1.6557377049180328,
+            "median_gap": 0.0,
+            "above_range": 0.03278688524590164,
+            "below_range": 0.0
+          }
+        ],
+        [
+          4,
+          {
+            "key": "preseason 6-10",
+            "n": 58,
+            "mean_gap": -0.08620689655172414,
+            "median_gap": -1.0,
+            "above_range": 0.034482758620689655,
+            "below_range": 0.0
+          }
+        ],
+        [
+          5,
+          {
+            "key": "preseason 6-10",
+            "n": 56,
+            "mean_gap": -0.23214285714285715,
+            "median_gap": 0.0,
+            "above_range": 0.017857142857142856,
+            "below_range": 0.0
+          }
+        ],
+        [
+          6,
+          {
+            "key": "preseason 6-10",
+            "n": 51,
+            "mean_gap": -0.21568627450980393,
+            "median_gap": 0.0,
+            "above_range": 0.0196078431372549,
+            "below_range": 0.0
+          }
+        ],
+        [
+          7,
+          {
+            "key": "preseason 6-10",
+            "n": 48,
+            "mean_gap": -0.2708333333333333,
+            "median_gap": 0.0,
+            "above_range": 0.020833333333333332,
+            "below_range": 0.0
+          }
+        ],
+        [
+          8,
+          {
+            "key": "preseason 6-10",
+            "n": 45,
+            "mean_gap": -0.6444444444444445,
+            "median_gap": 0.0,
+            "above_range": 0.044444444444444446,
+            "below_range": 0.0
+          }
+        ],
+        [
+          9,
+          {
+            "key": "preseason 6-10",
+            "n": 46,
+            "mean_gap": -1.6304347826086956,
+            "median_gap": -1.0,
+            "above_range": 0.021739130434782608,
+            "below_range": 0.021739130434782608
+          }
+        ],
+        [
+          10,
+          {
+            "key": "preseason 6-10",
+            "n": 40,
+            "mean_gap": -0.75,
+            "median_gap": 0.0,
+            "above_range": 0.05,
+            "below_range": 0.0
+          }
+        ],
+        [
+          11,
+          {
+            "key": "preseason 6-10",
+            "n": 37,
+            "mean_gap": -1.054054054054054,
+            "median_gap": 0.0,
+            "above_range": 0.05405405405405406,
+            "below_range": 0.05405405405405406
+          }
+        ],
+        [
+          12,
+          {
+            "key": "preseason 6-10",
+            "n": 40,
+            "mean_gap": -1.2,
+            "median_gap": -1.0,
+            "above_range": 0.075,
+            "below_range": 0.0
+          }
+        ],
+        [
+          13,
+          {
+            "key": "preseason 6-10",
+            "n": 39,
+            "mean_gap": -1.0256410256410255,
+            "median_gap": -1.0,
+            "above_range": 0.02564102564102564,
+            "below_range": 0.0
+          }
+        ],
+        [
+          14,
+          {
+            "key": "preseason 6-10",
+            "n": 40,
+            "mean_gap": -1.075,
+            "median_gap": -1.0,
+            "above_range": 0.05,
+            "below_range": 0.0
+          }
+        ],
+        [
+          15,
+          {
+            "key": "preseason 6-10",
+            "n": 38,
+            "mean_gap": -0.6842105263157895,
+            "median_gap": 0.0,
+            "above_range": 0.07894736842105263,
+            "below_range": 0.0
+          }
+        ],
+        [
+          16,
+          {
+            "key": "preseason 6-10",
+            "n": 17,
+            "mean_gap": -1.4705882352941178,
+            "median_gap": 0.0,
+            "above_range": 0.058823529411764705,
+            "below_range": 0.0
+          }
+        ]
+      ]
+    ],
+    [
+      "preseason 11-25",
+      [
+        [
+          1,
+          {
+            "key": "preseason 11-25",
+            "n": 195,
+            "mean_gap": 6.543589743589743,
+            "median_gap": 3.0,
+            "above_range": 0.03076923076923077,
+            "below_range": 0.0
+          }
+        ],
+        [
+          2,
+          {
+            "key": "preseason 11-25",
+            "n": 156,
+            "mean_gap": 4.794871794871795,
+            "median_gap": 3.0,
+            "above_range": 0.03205128205128205,
+            "below_range": 0.0
+          }
+        ],
+        [
+          3,
+          {
+            "key": "preseason 11-25",
+            "n": 143,
+            "mean_gap": 4.4475524475524475,
+            "median_gap": 3.0,
+            "above_range": 0.03496503496503497,
+            "below_range": 0.0
+          }
+        ],
+        [
+          4,
+          {
+            "key": "preseason 11-25",
+            "n": 132,
+            "mean_gap": 4.9393939393939394,
+            "median_gap": 3.0,
+            "above_range": 0.045454545454545456,
+            "below_range": 0.0
+          }
+        ],
+        [
+          5,
+          {
+            "key": "preseason 11-25",
+            "n": 124,
+            "mean_gap": 4.290322580645161,
+            "median_gap": 2.0,
+            "above_range": 0.07258064516129033,
+            "below_range": 0.0
+          }
+        ],
+        [
+          6,
+          {
+            "key": "preseason 11-25",
+            "n": 123,
+            "mean_gap": 3.3008130081300813,
+            "median_gap": 2.0,
+            "above_range": 0.032520325203252036,
+            "below_range": 0.0
+          }
+        ],
+        [
+          7,
+          {
+            "key": "preseason 11-25",
+            "n": 111,
+            "mean_gap": 2.4504504504504503,
+            "median_gap": 1.0,
+            "above_range": 0.06306306306306306,
+            "below_range": 0.0
+          }
+        ],
+        [
+          8,
+          {
+            "key": "preseason 11-25",
+            "n": 105,
+            "mean_gap": 2.9523809523809526,
+            "median_gap": 2.0,
+            "above_range": 0.0761904761904762,
+            "below_range": 0.0
+          }
+        ],
+        [
+          9,
+          {
+            "key": "preseason 11-25",
+            "n": 100,
+            "mean_gap": 3.26,
+            "median_gap": 2.0,
+            "above_range": 0.09,
+            "below_range": 0.0
+          }
+        ],
+        [
+          10,
+          {
+            "key": "preseason 11-25",
+            "n": 95,
+            "mean_gap": 2.3789473684210525,
+            "median_gap": 2.0,
+            "above_range": 0.05263157894736842,
+            "below_range": 0.010526315789473684
+          }
+        ],
+        [
+          11,
+          {
+            "key": "preseason 11-25",
+            "n": 85,
+            "mean_gap": 2.9058823529411764,
+            "median_gap": 2.0,
+            "above_range": 0.058823529411764705,
+            "below_range": 0.0
+          }
+        ],
+        [
+          12,
+          {
+            "key": "preseason 11-25",
+            "n": 87,
+            "mean_gap": 2.160919540229885,
+            "median_gap": 2.0,
+            "above_range": 0.05747126436781609,
+            "below_range": 0.011494252873563218
+          }
+        ],
+        [
+          13,
+          {
+            "key": "preseason 11-25",
+            "n": 82,
+            "mean_gap": 1.9878048780487805,
+            "median_gap": 1.0,
+            "above_range": 0.06097560975609756,
+            "below_range": 0.0
+          }
+        ],
+        [
+          14,
+          {
+            "key": "preseason 11-25",
+            "n": 76,
+            "mean_gap": 2.8289473684210527,
+            "median_gap": 2.0,
+            "above_range": 0.09210526315789473,
+            "below_range": 0.0
+          }
+        ],
+        [
+          15,
+          {
+            "key": "preseason 11-25",
+            "n": 78,
+            "mean_gap": 3.0,
+            "median_gap": 2.0,
+            "above_range": 0.07692307692307693,
+            "below_range": 0.0
+          }
+        ],
+        [
+          16,
+          {
+            "key": "preseason 11-25",
+            "n": 33,
+            "mean_gap": 0.8181818181818182,
+            "median_gap": 1.0,
+            "above_range": 0.0,
+            "below_range": 0.0
+          }
+        ]
+      ]
+    ],
+    [
+      "unranked preseason",
+      [
+        [
+          2,
+          {
+            "key": "unranked preseason",
+            "n": 26,
+            "mean_gap": 9.846153846153847,
+            "median_gap": 7.0,
+            "above_range": 0.07692307692307693,
+            "below_range": 0.0
+          }
+        ],
+        [
+          3,
+          {
+            "key": "unranked preseason",
+            "n": 58,
+            "mean_gap": 9.258620689655173,
+            "median_gap": 7.0,
+            "above_range": 0.08620689655172414,
+            "below_range": 0.0
+          }
+        ],
+        [
+          4,
+          {
+            "key": "unranked preseason",
+            "n": 73,
+            "mean_gap": 10.342465753424657,
+            "median_gap": 9.0,
+            "above_range": 0.1095890410958904,
+            "below_range": 0.0
+          }
+        ],
+        [
+          5,
+          {
+            "key": "unranked preseason",
+            "n": 85,
+            "mean_gap": 8.764705882352942,
+            "median_gap": 6.0,
+            "above_range": 0.09411764705882353,
+            "below_range": 0.0
+          }
+        ],
+        [
+          6,
+          {
+            "key": "unranked preseason",
+            "n": 94,
+            "mean_gap": 9.0,
+            "median_gap": 9.0,
+            "above_range": 0.06382978723404255,
+            "below_range": 0.0
+          }
+        ],
+        [
+          7,
+          {
+            "key": "unranked preseason",
+            "n": 110,
+            "mean_gap": 10.0,
+            "median_gap": 9.0,
+            "above_range": 0.10909090909090909,
+            "below_range": 0.0
+          }
+        ],
+        [
+          8,
+          {
+            "key": "unranked preseason",
+            "n": 117,
+            "mean_gap": 9.598290598290598,
+            "median_gap": 9.0,
+            "above_range": 0.07692307692307693,
+            "below_range": 0.0
+          }
+        ],
+        [
+          9,
+          {
+            "key": "unranked preseason",
+            "n": 120,
+            "mean_gap": 9.183333333333334,
+            "median_gap": 7.0,
+            "above_range": 0.08333333333333333,
+            "below_range": 0.0
+          }
+        ],
+        [
+          10,
+          {
+            "key": "unranked preseason",
+            "n": 132,
+            "mean_gap": 9.401515151515152,
+            "median_gap": 7.0,
+            "above_range": 0.14393939393939395,
+            "below_range": 0.0
+          }
+        ],
+        [
+          11,
+          {
+            "key": "unranked preseason",
+            "n": 123,
+            "mean_gap": 8.894308943089431,
+            "median_gap": 7.0,
+            "above_range": 0.16260162601626016,
+            "below_range": 0.0
+          }
+        ],
+        [
+          12,
+          {
+            "key": "unranked preseason",
+            "n": 119,
+            "mean_gap": 9.789915966386555,
+            "median_gap": 7.0,
+            "above_range": 0.19327731092436976,
+            "below_range": 0.0
+          }
+        ],
+        [
+          13,
+          {
+            "key": "unranked preseason",
+            "n": 124,
+            "mean_gap": 10.483870967741936,
+            "median_gap": 9.0,
+            "above_range": 0.14516129032258066,
+            "below_range": 0.008064516129032258
+          }
+        ],
+        [
+          14,
+          {
+            "key": "unranked preseason",
+            "n": 128,
+            "mean_gap": 9.078125,
+            "median_gap": 6.0,
+            "above_range": 0.1484375,
+            "below_range": 0.0078125
+          }
+        ],
+        [
+          15,
+          {
+            "key": "unranked preseason",
+            "n": 128,
+            "mean_gap": 8.828125,
+            "median_gap": 7.0,
+            "above_range": 0.125,
+            "below_range": 0.0078125
+          }
+        ],
+        [
+          16,
+          {
+            "key": "unranked preseason",
+            "n": 53,
+            "mean_gap": 10.924528301886792,
+            "median_gap": 8.0,
+            "above_range": 0.18867924528301888,
+            "below_range": 0.0
+          }
+        ]
+      ]
+    ]
+  ],
+  "agreement_by_week": [
+    [
+      1,
+      8.52923076923077
+    ],
+    [
+      2,
+      7.6245847176079735
+    ],
+    [
+      3,
+      7.689230769230769
+    ],
+    [
+      4,
+      7.9107692307692306
+    ],
+    [
+      5,
+      7.32923076923077
+    ],
+    [
+      6,
+      7.128440366972477
+    ],
+    [
+      7,
+      7.4338461538461535
+    ],
+    [
+      8,
+      7.67076923076923
+    ],
+    [
+      9,
+      7.323076923076923
+    ],
+    [
+      10,
+      7.667692307692308
+    ],
+    [
+      11,
+      7.803333333333334
+    ],
+    [
+      12,
+      7.663333333333333
+    ],
+    [
+      13,
+      7.88
+    ],
+    [
+      14,
+      7.336666666666667
+    ],
+    [
+      15,
+      7.32
+    ],
+    [
+      16,
+      7.4
+    ]
+  ],
+  "snubs_by_conference": [
+    {
+      "key": "Big Ten",
+      "count": 26
+    },
+    {
+      "key": "Big 12",
+      "count": 20
+    },
+    {
+      "key": "SEC",
+      "count": 6
+    },
+    {
+      "key": "Pac-12",
+      "count": 5
+    },
+    {
+      "key": "ACC",
+      "count": 3
+    },
+    {
+      "key": "American Athletic",
+      "count": 1
+    },
+    {
+      "key": "Independent",
+      "count": 1
+    }
+  ],
+  "latest": [
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "Miami",
+      "conference": "ACC",
+      "poll_rank": 1,
+      "model_rank": 2,
+      "model_low": 1,
+      "model_high": 21,
+      "preseason_ap": 7
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "Georgia",
+      "conference": "SEC",
+      "poll_rank": 2,
+      "model_rank": 1,
+      "model_low": 1,
+      "model_high": 18,
+      "preseason_ap": 3
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "Utah",
+      "conference": "Big 12",
+      "poll_rank": 3,
+      "model_rank": 9,
+      "model_low": 2,
+      "model_high": 28,
+      "preseason_ap": 21
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "Notre Dame",
+      "conference": "Independent",
+      "poll_rank": 4,
+      "model_rank": 5,
+      "model_low": 1,
+      "model_high": 21,
+      "preseason_ap": 4
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "UCLA",
+      "conference": "Big Ten",
+      "poll_rank": 5,
+      "model_rank": 22,
+      "model_low": 9,
+      "model_high": 47,
+      "preseason_ap": null
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "Indiana",
+      "conference": "Big Ten",
+      "poll_rank": 6,
+      "model_rank": 10,
+      "model_low": 2,
+      "model_high": 25,
+      "preseason_ap": 6
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "BYU",
+      "conference": "Big 12",
+      "poll_rank": 7,
+      "model_rank": 21,
+      "model_low": 7,
+      "model_high": 48,
+      "preseason_ap": 14
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "Kentucky",
+      "conference": "SEC",
+      "poll_rank": 8,
+      "model_rank": 25,
+      "model_low": 7,
+      "model_high": 51,
+      "preseason_ap": null
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "Alabama",
+      "conference": "SEC",
+      "poll_rank": 9,
+      "model_rank": 4,
+      "model_low": 1,
+      "model_high": 24,
+      "preseason_ap": 13
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "Texas",
+      "conference": "SEC",
+      "poll_rank": 10,
+      "model_rank": 7,
+      "model_low": 1,
+      "model_high": 25,
+      "preseason_ap": 5
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "Ohio State",
+      "conference": "Big Ten",
+      "poll_rank": 11,
+      "model_rank": 3,
+      "model_low": 1,
+      "model_high": 22,
+      "preseason_ap": 1
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "Ole Miss",
+      "conference": "SEC",
+      "poll_rank": 12,
+      "model_rank": 6,
+      "model_low": 1,
+      "model_high": 21,
+      "preseason_ap": 9
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "Texas Tech",
+      "conference": "Big 12",
+      "poll_rank": 13,
+      "model_rank": 15,
+      "model_low": 4,
+      "model_high": 36,
+      "preseason_ap": 12
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "Wake Forest",
+      "conference": "ACC",
+      "poll_rank": 14,
+      "model_rank": 11,
+      "model_low": 3,
+      "model_high": 34,
+      "preseason_ap": null
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "LSU",
+      "conference": "SEC",
+      "poll_rank": 15,
+      "model_rank": 8,
+      "model_low": 1,
+      "model_high": 26,
+      "preseason_ap": 11
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "Tennessee",
+      "conference": "SEC",
+      "poll_rank": 16,
+      "model_rank": 14,
+      "model_low": 4,
+      "model_high": 42,
+      "preseason_ap": 20
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "Houston",
+      "conference": "Big 12",
+      "poll_rank": 17,
+      "model_rank": 20,
+      "model_low": 8,
+      "model_high": 49,
+      "preseason_ap": 23
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "USC",
+      "conference": "Big Ten",
+      "poll_rank": 18,
+      "model_rank": 26,
+      "model_low": 10,
+      "model_high": 53,
+      "preseason_ap": 14
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "Missouri",
+      "conference": "SEC",
+      "poll_rank": 19,
+      "model_rank": 17,
+      "model_low": 5,
+      "model_high": 42,
+      "preseason_ap": 25
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "Boise State",
+      "conference": "Pac-12",
+      "poll_rank": 20,
+      "model_rank": 33,
+      "model_low": 15,
+      "model_high": 69,
+      "preseason_ap": null
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "Iowa",
+      "conference": "Big Ten",
+      "poll_rank": 21,
+      "model_rank": 12,
+      "model_low": 4,
+      "model_high": 38,
+      "preseason_ap": 22
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "New Mexico",
+      "conference": "Mountain West",
+      "poll_rank": 22,
+      "model_rank": 47,
+      "model_low": 25,
+      "model_high": 79,
+      "preseason_ap": null
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "South Carolina",
+      "conference": "SEC",
+      "poll_rank": 23,
+      "model_rank": 18,
+      "model_low": 6,
+      "model_high": 46,
+      "preseason_ap": null
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "Arizona",
+      "conference": "Big 12",
+      "poll_rank": 24,
+      "model_rank": 16,
+      "model_low": 4,
+      "model_high": 42,
+      "preseason_ap": null
+    },
+    {
+      "year": 2026,
+      "poll": "AP Top 25",
+      "week": 10,
+      "team": "Florida",
+      "conference": "SEC",
+      "poll_rank": 25,
+      "model_rank": 24,
+      "model_low": 8,
+      "model_high": 54,
+      "preseason_ap": null
+    }
+  ]
+}

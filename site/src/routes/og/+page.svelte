@@ -21,4 +21,8 @@
 			</li>
 		{/each}
 	</ol>
+	<div class="mt-auto flex justify-between text-xl text-muted">
+		<span>Rating = expected margin vs. an average FBS team</span>
+		<span>cfb.alpacasoft.dev</span>
+	</div>
 </div>

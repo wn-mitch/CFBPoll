@@ -51,35 +51,48 @@
 
 	<h2>The season start</h2>
 	{#if data.meta.uses_prior && data.prior}
+		{@const kept = [
+			data.prior.blocks.returning && 'returning production',
+			data.prior.blocks.continuity && 'roster continuity by position group',
+			data.prior.blocks.portal && 'transfer-portal flow',
+			data.prior.blocks.talent && 'the recruiting talent composite'
+		].filter(Boolean)}
+		{@const dropped = [
+			!data.prior.blocks.returning && 'returning production',
+			!data.prior.blocks.continuity && 'roster continuity by position group',
+			!data.prior.blocks.portal && 'transfer-portal flow',
+			!data.prior.blocks.talent && 'the recruiting talent composite'
+		].filter(Boolean)}
 		<p>
-			A team starts each season from last season's rating, adjusted by how much of the roster returned. The weights
-			come from a regression on {data.prior.train_years[0]}–{data.prior.train_years[data.prior.train_years.length - 1]}
-			seasons, not from reputation or polls. The recruiting-based talent composite was
-			{data.prior.talent_kept ? 'kept because it improved accuracy' : 'tested and dropped: it did not improve accuracy'}.
-			Starting uncertainty is wide (about ±{(1.645 * Math.hypot(data.prior.sd_offense, data.prior.sd_defense)).toFixed(0)}
-			points of overall rating), so results take over within a few weeks.
+			A team starts each season from last season's rating{kept.length ? `, adjusted for ${kept.join(' and ')}` : ''}.
+			The weights come from a regression on {data.prior.train_years[0]}–{data.prior.train_years[data.prior.train_years.length - 1]}
+			seasons, not from reputation or polls. {#if dropped.length}We also tested {dropped.join(', ')}; none improved
+				accuracy, so they are not used.{/if} Starting uncertainty is wide (about ±{(
+				1.645 * Math.hypot(data.prior.sd_offense, data.prior.sd_defense)
+			).toFixed(0)} points of overall rating), so results take over within a few weeks.
 		</p>
-		<p>Predicting each team's end-of-season rating, measured by error in points (leave-one-season-out):</p>
+		<p>Error predicting each team's end-of-season rating, in points (leave-one-season-out):</p>
 		<table class="num mb-4 w-full max-w-xl text-sm">
-			<thead><tr class="border-b border-border text-left text-xs text-muted"><th class="py-1 font-medium">Inputs</th><th class="text-right font-medium">Offense</th><th class="text-right font-medium">Defense</th></tr></thead>
+			<thead
+				><tr class="border-b border-border text-left text-xs text-muted"
+					><th class="py-1 font-medium">Inputs</th><th class="text-right font-medium">Offense</th><th
+						class="text-right font-medium">Defense</th
+					></tr
+				></thead
+			>
 			<tbody>
 				{#each data.prior.cv as c (c.name)}
-					<tr class="border-b border-border"><td class="py-1">{c.name}</td><td class="text-right">{c.rmse_o.toFixed(2)}</td><td class="text-right">{c.rmse_d.toFixed(2)}</td></tr>
+					<tr class="border-b border-border"
+						><td class="py-1">{c.name}</td><td class="text-right">{c.rmse_o.toFixed(2)}</td><td class="text-right"
+							>{c.rmse_d.toFixed(2)}</td
+						></tr
+					>
 				{/each}
 			</tbody>
 		</table>
 		<p>
-			Last season's rating does most of the work. Roster turnover by position group adds little on top of it.
-			Fitted effect of a group returning in full versus not at all, for an average team, in points:
+			Last season's rating does almost all of the work. Roster details, position by position, add little beyond it.
 		</p>
-		<table class="num mb-4 w-full max-w-md text-sm">
-			<thead><tr class="border-b border-border text-left text-xs text-muted"><th class="py-1 font-medium">Group</th><th class="text-right font-medium">Offense</th><th class="text-right font-medium">Defense</th></tr></thead>
-			<tbody>
-				{#each data.prior.continuity_effects as e (e.group)}
-					<tr class="border-b border-border"><td class="py-1">{e.group}</td><td class="text-right">{signed(e.offense, 2)}</td><td class="text-right">{signed(e.defense, 2)}</td></tr>
-				{/each}
-			</tbody>
-		</table>
 	{:else}
 		<p>Every team starts the season from its division's average with wide uncertainty.</p>
 	{/if}

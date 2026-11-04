@@ -185,6 +185,7 @@ struct GroupEffect {
 #[derive(Serialize)]
 struct PriorSummary {
     train_years: Vec<i32>,
+    blocks: model::prior::Blocks,
     talent_kept: bool,
     sd_offense: f64,
     sd_defense: f64,
@@ -195,6 +196,7 @@ struct PriorSummary {
 fn prior_summary(m: &model::prior::PriorModel) -> PriorSummary {
     PriorSummary {
         train_years: m.train_years.clone(),
+        blocks: m.blocks,
         talent_kept: m.blocks.talent,
         sd_offense: m.sd_o,
         sd_defense: m.sd_d,

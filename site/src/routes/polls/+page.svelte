@@ -36,7 +36,7 @@
 		</div>
 		<div class="rounded-lg border border-border bg-surface p-3">
 			{#each stats as s (s.key)}
-				<div class="grid grid-cols-[9rem_1fr_9rem] items-center gap-3 py-1 text-sm sm:grid-cols-[11rem_1fr_13rem]">
+				<div class="grid grid-cols-[9rem_1fr_9rem] items-center gap-3 py-1 text-sm sm:grid-cols-[11rem_1fr_17rem]">
 					<div class="truncate">{s.key}</div>
 					<div class="relative h-4">
 						<div

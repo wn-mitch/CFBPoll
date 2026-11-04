@@ -186,6 +186,7 @@ export interface Accuracy {
 
 export interface PriorSummary {
 	train_years: number[];
+	blocks: { returning: boolean; continuity: boolean; portal: boolean; talent: boolean };
 	talent_kept: boolean;
 	sd_offense: number;
 	sd_defense: number;

@@ -182,19 +182,14 @@ pub fn run(
         results.push((blocks, l, o + d));
     }
 
-    // Talent is a recruiting rating and can carry reputation; keep it only
-    // if it improves cross-validated error.
-    let without = results[3];
-    let with = results[4];
-    let (blocks, l, _) = if with.2 < without.2 { with } else { without };
-    eprintln!(
-        "talent composite {}",
-        if blocks.talent {
-            "kept (improves CV error)"
-        } else {
-            "dropped (does not improve CV error)"
-        }
-    );
+    // Keep the feature set with the lowest cross-validated error. Each set
+    // adds one block, so a block (talent included, which is a recruiting
+    // rating and can carry reputation) survives only if it earns its place.
+    let (blocks, l, _) = *results
+        .iter()
+        .min_by(|a, b| a.2.total_cmp(&b.2))
+        .expect("at least one feature set");
+    eprintln!("chose {blocks:?} (lambda {l})");
 
     let mut model = PriorModel::fit(&ex, blocks, l);
     let (cv_o, cv_d) = rmse(&ex, &cross_validate(&ex, blocks, l));

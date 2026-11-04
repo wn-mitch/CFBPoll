@@ -1,0 +1,260 @@
+{
+  "years": "2024–2025",
+  "rows": [
+    {
+      "model": "cfbd-elo",
+      "slice": "Fbs",
+      "summary": {
+        "games": 1606,
+        "log_loss": 0.5623974697262658,
+        "brier": 0.191576072793065,
+        "accuracy": 0.6961394769613948,
+        "margin_mae": null,
+        "total_mae": null,
+        "market_games": 0,
+        "model_mae_on_market_games": null,
+        "market_mae": null,
+        "model_total_mae_on_market_games": null,
+        "market_total_mae": null
+      }
+    },
+    {
+      "model": "cfbd-elo",
+      "slice": "FbsEarly",
+      "summary": {
+        "games": 389,
+        "log_loss": 0.539220875885741,
+        "brier": 0.18321334222477265,
+        "accuracy": 0.7095115681233933,
+        "margin_mae": null,
+        "total_mae": null,
+        "market_games": 0,
+        "model_mae_on_market_games": null,
+        "market_mae": null,
+        "model_total_mae_on_market_games": null,
+        "market_total_mae": null
+      }
+    },
+    {
+      "model": "cfbd-elo",
+      "slice": "Rated",
+      "summary": {
+        "games": 1606,
+        "log_loss": 0.5623974697262658,
+        "brier": 0.191576072793065,
+        "accuracy": 0.6961394769613948,
+        "margin_mae": null,
+        "total_mae": null,
+        "market_games": 0,
+        "model_mae_on_market_games": null,
+        "market_mae": null,
+        "model_total_mae_on_market_games": null,
+        "market_total_mae": null
+      }
+    },
+    {
+      "model": "kalman",
+      "slice": "Fbs",
+      "summary": {
+        "games": 1606,
+        "log_loss": 0.5553011395248035,
+        "brier": 0.18950254770761185,
+        "accuracy": 0.699252801992528,
+        "margin_mae": 12.959968028759695,
+        "total_mae": 12.945396600602583,
+        "market_games": 1606,
+        "model_mae_on_market_games": 12.959968028759695,
+        "market_mae": 11.941313823163139,
+        "model_total_mae_on_market_games": 12.945396600602583,
+        "market_total_mae": 12.629981320049804
+      }
+    },
+    {
+      "model": "kalman",
+      "slice": "FbsEarly",
+      "summary": {
+        "games": 389,
+        "log_loss": 0.5566143192907315,
+        "brier": 0.19062265410974671,
+        "accuracy": 0.6735218508997429,
+        "margin_mae": 15.247279930853786,
+        "total_mae": 12.671380359687905,
+        "market_games": 389,
+        "model_mae_on_market_games": 15.247279930853786,
+        "market_mae": 12.563624678663235,
+        "model_total_mae_on_market_games": 12.671380359687905,
+        "market_total_mae": 12.525064267352178
+      }
+    },
+    {
+      "model": "kalman",
+      "slice": "Rated",
+      "summary": {
+        "games": 3233,
+        "log_loss": 0.5171134040197278,
+        "brier": 0.17379000541570475,
+        "accuracy": 0.732137333745747,
+        "margin_mae": 12.85937552119088,
+        "total_mae": 12.974912805152378,
+        "market_games": 3154,
+        "model_mae_on_market_games": 12.847282375728312,
+        "market_mae": 11.899281335869796,
+        "model_total_mae_on_market_games": 12.992048867101975,
+        "market_total_mae": 12.622232814320515
+      }
+    },
+    {
+      "model": "kalman-prior",
+      "slice": "Fbs",
+      "summary": {
+        "games": 1606,
+        "log_loss": 0.5350604072728816,
+        "brier": 0.18179554419236235,
+        "accuracy": 0.7191780821917808,
+        "margin_mae": 12.430728783652336,
+        "total_mae": 12.856502421693122,
+        "market_games": 1606,
+        "model_mae_on_market_games": 12.430728783652336,
+        "market_mae": 11.941313823163139,
+        "model_total_mae_on_market_games": 12.856502421693122,
+        "market_total_mae": 12.629981320049804
+      }
+    },
+    {
+      "model": "kalman-prior",
+      "slice": "FbsEarly",
+      "summary": {
+        "games": 389,
+        "log_loss": 0.4998451476483435,
+        "brier": 0.17061977412530088,
+        "accuracy": 0.7249357326478149,
+        "margin_mae": 13.248567268331026,
+        "total_mae": 12.689659295033454,
+        "market_games": 389,
+        "model_mae_on_market_games": 13.248567268331026,
+        "market_mae": 12.563624678663235,
+        "model_total_mae_on_market_games": 12.689659295033454,
+        "market_total_mae": 12.525064267352178
+      }
+    },
+    {
+      "model": "kalman-prior",
+      "slice": "Rated",
+      "summary": {
+        "games": 3233,
+        "log_loss": 0.4955306672007779,
+        "brier": 0.16602710476995128,
+        "accuracy": 0.7466749149396845,
+        "margin_mae": 12.289367213214865,
+        "total_mae": 12.822128839719767,
+        "market_games": 3154,
+        "model_mae_on_market_games": 12.294466637402373,
+        "market_mae": 11.899281335869796,
+        "model_total_mae_on_market_games": 12.83941516604681,
+        "market_total_mae": 12.622232814320515
+      }
+    },
+    {
+      "model": "kalman-score",
+      "slice": "Fbs",
+      "summary": {
+        "games": 1606,
+        "log_loss": 0.555626499590051,
+        "brier": 0.18950582396783003,
+        "accuracy": 0.701120797011208,
+        "margin_mae": 12.956580420037925,
+        "total_mae": 13.264884285257455,
+        "market_games": 1606,
+        "model_mae_on_market_games": 12.956580420037925,
+        "market_mae": 11.941313823163139,
+        "model_total_mae_on_market_games": 13.264884285257455,
+        "market_total_mae": 12.629981320049804
+      }
+    },
+    {
+      "model": "kalman-score",
+      "slice": "FbsEarly",
+      "summary": {
+        "games": 389,
+        "log_loss": 0.5578094647552438,
+        "brier": 0.19086915635560214,
+        "accuracy": 0.6812339331619537,
+        "margin_mae": 15.312419311651661,
+        "total_mae": 12.945742506073984,
+        "market_games": 389,
+        "model_mae_on_market_games": 15.312419311651661,
+        "market_mae": 12.563624678663235,
+        "model_total_mae_on_market_games": 12.945742506073984,
+        "market_total_mae": 12.525064267352178
+      }
+    },
+    {
+      "model": "kalman-score",
+      "slice": "Rated",
+      "summary": {
+        "games": 3233,
+        "log_loss": 0.5175277423493666,
+        "brier": 0.17387839870263916,
+        "accuracy": 0.7336838849365914,
+        "margin_mae": 12.858834861765473,
+        "total_mae": 13.277139447184133,
+        "market_games": 3154,
+        "model_mae_on_market_games": 12.846534271220513,
+        "market_mae": 11.899281335869796,
+        "model_total_mae_on_market_games": 13.295650459132453,
+        "market_total_mae": 12.622232814320515
+      }
+    },
+    {
+      "model": "legacy-elo",
+      "slice": "Fbs",
+      "summary": {
+        "games": 1606,
+        "log_loss": 0.6004128766279268,
+        "brier": 0.20627856975766717,
+        "accuracy": 0.6855541718555417,
+        "margin_mae": 13.729726515085282,
+        "total_mae": null,
+        "market_games": 1606,
+        "model_mae_on_market_games": 13.729726515085282,
+        "market_mae": 11.941313823163139,
+        "model_total_mae_on_market_games": null,
+        "market_total_mae": null
+      }
+    },
+    {
+      "model": "legacy-elo",
+      "slice": "FbsEarly",
+      "summary": {
+        "games": 389,
+        "log_loss": 0.6333453481839348,
+        "brier": 0.22116669141139397,
+        "accuracy": 0.6503856041131105,
+        "margin_mae": 17.00484322705301,
+        "total_mae": null,
+        "market_games": 389,
+        "model_mae_on_market_games": 17.00484322705301,
+        "market_mae": 12.563624678663235,
+        "model_total_mae_on_market_games": null,
+        "market_total_mae": null
+      }
+    },
+    {
+      "model": "legacy-elo",
+      "slice": "Rated",
+      "summary": {
+        "games": 3233,
+        "log_loss": 0.565868755228422,
+        "brier": 0.19161262969491874,
+        "accuracy": 0.7157438911227961,
+        "margin_mae": 13.580301173821098,
+        "total_mae": null,
+        "market_games": 3154,
+        "model_mae_on_market_games": 13.566334206923516,
+        "market_mae": 11.899281335869796,
+        "model_total_mae_on_market_games": null,
+        "market_total_mae": null
+      }
+    }
+  ]
+}
