@@ -58,6 +58,9 @@ pub struct Game {
     pub day: i64,
     pub neutral: bool,
     pub conference_game: bool,
+    /// A conference championship game.
+    #[serde(default)]
+    pub championship: bool,
     /// Index into `Season::teams`.
     pub home: usize,
     pub away: usize,

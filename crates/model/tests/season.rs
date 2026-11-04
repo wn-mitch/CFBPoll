@@ -25,6 +25,7 @@ fn game(id: i64, week: i32, home: usize, away: usize, score: Option<(f64, f64)>)
         day: 20_000 + 7 * week as i64,
         neutral: false,
         conference_game: false,
+        championship: false,
         home,
         away,
         score,
@@ -260,4 +261,50 @@ fn snapshots_respect_cutoff_week() {
         .iter()
         .all(|s| s.week.is_none_or(|w| w < cutoff)));
     assert_eq!(run.snapshots.len(), 3, "preseason + weeks 1 and 2");
+}
+
+#[test]
+fn efficiency_reading_tightens_ratings_more() {
+    let teams = vec![team("A", Class::Fbs, None), team("B", Class::Fbs, None)];
+    let mut g = game(1, 1, 0, 1, Some((28.0, 21.0)));
+    let without = Season {
+        year: 2024,
+        teams: teams.clone(),
+        games: vec![g.clone()],
+    };
+    g.ppa = Some((0.35, 0.05));
+    let with = Season {
+        year: 2024,
+        teams,
+        games: vec![g],
+    };
+    let params = Params::default();
+    let a = run_season(&without, &params, &RunOptions::default());
+    let b = run_season(&with, &params, &RunOptions::default());
+    let sd = |r: &model::season::SeasonRun| r.final_ratings()[0].overall_sd;
+    assert!(
+        sd(&b) < sd(&a),
+        "PPA should add information: {} vs {}",
+        sd(&b),
+        sd(&a)
+    );
+
+    // With efficiency disabled, the PPA reading is ignored entirely.
+    let off = Params {
+        use_efficiency: false,
+        ..params
+    };
+    let c = run_season(&with, &off, &RunOptions::default());
+    assert_eq!(sd(&c), sd(&a));
+    assert_eq!(c.final_ratings()[0].overall, a.final_ratings()[0].overall);
+}
+
+#[test]
+fn invalid_noise_is_rejected() {
+    let p = Params {
+        ppa_score_corr: 1.5,
+        ..Params::default()
+    };
+    assert!(!p.is_valid());
+    assert!(Params::default().is_valid());
 }

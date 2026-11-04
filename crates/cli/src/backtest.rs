@@ -2,15 +2,18 @@
 //! baselines. Every forecast is made before the game it scores.
 
 use crate::load::load_season;
+use crate::prior::{load_model, loso_priors, union_years, PriorData};
 use anyhow::Result;
 use cfbd::Cache;
 use model::data::{Class, Game, Season};
+use model::layout::TeamPrior;
 use model::legacy_elo::{self, EloParams, EloTable};
 use model::metrics::{Forecast, Scorecard, Summary};
 use model::params::Params;
 use model::season::{run_season, RunOptions};
 use serde::Serialize;
 use std::collections::BTreeMap;
+use std::path::Path;
 
 /// Which games a scorecard covers.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize)]
@@ -64,8 +67,21 @@ fn forecast(g: &Game, home_win: f64, margin: Option<f64>, total: Option<f64>) ->
 }
 
 /// Scores the Kalman model on one season.
-pub fn score_model(season: &Season, params: &Params, name: &str, cards: &mut Cards) {
-    let run = run_season(season, params, &RunOptions::default());
+pub fn score_model(
+    season: &Season,
+    params: &Params,
+    priors: &[Option<TeamPrior>],
+    name: &str,
+    cards: &mut Cards,
+) {
+    let run = run_season(
+        season,
+        params,
+        &RunOptions {
+            priors,
+            before: None,
+        },
+    );
     for (gi, p) in &run.predictions {
         let g = &season.games[*gi];
         if let Some(f) = forecast(g, p.home_win, Some(p.margin), Some(p.total)) {
@@ -74,18 +90,42 @@ pub fn score_model(season: &Season, params: &Params, name: &str, cards: &mut Car
     }
 }
 
-pub fn run(cache: &Cache, years: &[i32], params: &Params, json: bool) -> Result<()> {
+pub fn run(
+    cache: &Cache,
+    years: &[i32],
+    params: &Params,
+    prior: Option<&Path>,
+    json: bool,
+) -> Result<()> {
     let seasons: Vec<Season> = years
         .iter()
         .map(|&y| load_season(cache, y))
         .collect::<Result<_>>()?;
+    let priors: Option<Vec<Vec<Option<TeamPrior>>>> = match prior {
+        None => None,
+        Some(path) => {
+            let template = load_model(path)?;
+            let data = PriorData::load(cache, &union_years(years, &template.train_years), params)?;
+            Some(loso_priors(&data, &template, years))
+        }
+    };
+    let score_only = Params {
+        use_efficiency: false,
+        ..params.clone()
+    };
 
     let mut by_year: BTreeMap<i32, Cards> = BTreeMap::new();
     let mut elo_table: Option<EloTable> = None;
     let elo = EloParams::default();
-    for season in &seasons {
+    for (si, season) in seasons.iter().enumerate() {
         let cards = by_year.entry(season.year).or_default();
-        score_model(season, params, "kalman", cards);
+        score_model(season, params, &[], "kalman", cards);
+        if params.use_efficiency {
+            score_model(season, &score_only, &[], "kalman-score", cards);
+        }
+        if let Some(p) = &priors {
+            score_model(season, params, &p[si], "kalman-prior", cards);
+        }
 
         let (preds, table) = legacy_elo::run(season, &elo, elo_table.as_ref());
         for (gi, p, m) in preds {

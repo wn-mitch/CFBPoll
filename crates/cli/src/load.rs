@@ -117,6 +117,10 @@ pub fn load_season(cache: &Cache, year: i32) -> Result<Season> {
             day,
             neutral: g.neutral_site,
             conference_game: g.conference_game,
+            championship: g.conference_game
+                && g.notes
+                    .as_deref()
+                    .is_some_and(|n| n.contains("Championship")),
             home,
             away,
             score,

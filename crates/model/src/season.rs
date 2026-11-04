@@ -3,7 +3,7 @@
 use crate::data::{Season, Week};
 use crate::kalman::Gaussian;
 use crate::layout::{class_prior, drift_variances, initial_state, Layout, TeamPrior};
-use crate::observe::{predict, score_observation, Prediction};
+use crate::observe::{game_observation, predict, Prediction};
 use crate::params::Params;
 use serde::{Deserialize, Serialize};
 
@@ -121,7 +121,7 @@ pub fn run_season(season: &Season, params: &Params, opts: &RunOptions) -> Season
         }
 
         predictions.push((gi, predict(&state, &layout, params, game)));
-        state.update(&score_observation(&layout, params, game, score));
+        state.update(&game_observation(&layout, params, game, score));
     }
     if current_week.is_some() {
         snapshots.push(snapshot(&state, current_week));

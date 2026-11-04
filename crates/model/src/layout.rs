@@ -134,15 +134,25 @@ pub fn initial_state(
     mean[MU] = params.mu_mean;
     var[MU] = params.mu_sd.powi(2);
     for (t, team) in season.teams.iter().enumerate() {
-        let p = overrides.get(t).copied().flatten().unwrap_or_else(|| {
-            let c = class_prior(params, team.class);
-            TeamPrior {
-                o_mean: c.mean,
-                o_sd: c.sd,
-                d_mean: c.mean,
-                d_sd: c.sd,
-            }
-        });
+        let scaled = |p: TeamPrior| TeamPrior {
+            o_sd: p.o_sd * params.prior_sd_scale,
+            d_sd: p.d_sd * params.prior_sd_scale,
+            ..p
+        };
+        let p = overrides
+            .get(t)
+            .copied()
+            .flatten()
+            .map(scaled)
+            .unwrap_or_else(|| {
+                let c = class_prior(params, team.class);
+                TeamPrior {
+                    o_mean: c.mean,
+                    o_sd: c.sd,
+                    d_mean: c.mean,
+                    d_sd: c.sd,
+                }
+            });
         mean[layout.team_o(t)] = p.o_mean;
         var[layout.team_o(t)] = p.o_sd.powi(2);
         mean[layout.team_d(t)] = p.d_mean;

@@ -25,9 +25,11 @@ pub fn home_shift(game: &Game, params: &Params) -> f64 {
     }
 }
 
-/// Score observation for a completed game. The margin is soft-capped while
-/// the total is kept, so a blowout counts like a large-but-finite win.
-pub fn score_observation(
+/// Observation for a completed game: both scores, plus each offense's PPA
+/// per play when available and enabled. The margin is soft-capped while the
+/// total is kept, so a blowout counts like a large-but-finite win. PPA is
+/// garbage-time-excluded at the source and is not capped.
+pub fn game_observation(
     layout: &Layout,
     params: &Params,
     game: &Game,
@@ -37,16 +39,35 @@ pub fn score_observation(
     let total = h + a;
     let margin = cap_margin(h - a, params.margin_cap);
     let shift = home_shift(game, params);
-    let s2 = params.score_sd.powi(2);
-    let c = params.score_corr * s2;
+    let mut rows = vec![
+        layout.points(game.home, game.away),
+        layout.points(game.away, game.home),
+    ];
+    let mut offset = vec![shift, -shift];
+    let mut y = vec![(total + margin) / 2.0, (total - margin) / 2.0];
+    let ppa = game.ppa.filter(|_| params.use_efficiency);
+    if let Some((hp, ap)) = ppa {
+        let k = params.ppa_scale;
+        for (off, def, s, v) in [
+            (game.home, game.away, shift, hp),
+            (game.away, game.home, -shift, ap),
+        ] {
+            let mut r: Row = layout
+                .offense(off)
+                .into_iter()
+                .map(|(i, c)| (i, k * c))
+                .collect();
+            r.extend(layout.defense(def).into_iter().map(|(i, c)| (i, -k * c)));
+            rows.push(r);
+            offset.push(params.ppa_mean + k * s);
+            y.push(v);
+        }
+    }
     Observation {
-        rows: vec![
-            layout.points(game.home, game.away),
-            layout.points(game.away, game.home),
-        ],
-        offset: vec![shift, -shift],
-        y: vec![(total + margin) / 2.0, (total - margin) / 2.0],
-        noise: vec![s2, c, c, s2],
+        rows,
+        offset,
+        y,
+        noise: params.game_noise(ppa.is_some()),
     }
 }
 
