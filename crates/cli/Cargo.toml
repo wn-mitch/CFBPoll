@@ -1,0 +1,17 @@
+[package]
+name = "cfbpoll"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "cfbpoll"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+cfbd = { path = "../cfbd" }
+clap.workspace = true
+model = { path = "../model" }
+serde.workspace = true
+serde_json.workspace = true
