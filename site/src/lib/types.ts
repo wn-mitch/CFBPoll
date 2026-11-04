@@ -49,6 +49,17 @@ export interface RankRow {
 	last_game: GameRef | null;
 	schedule_strength: number;
 	top25_expected_losses: number;
+	history: WeekPoint[];
+}
+
+export interface WeekPoint {
+	label: string;
+	rank: number;
+	rank_low: number;
+	rank_high: number;
+	overall: number;
+	change: number | null;
+	games: GameRef[];
 }
 
 export interface TrajectoryPoint {
@@ -110,6 +121,7 @@ export interface GamePrediction {
 	home_win: number;
 	home_points: number;
 	away_points: number;
+	margin: number;
 	margin_sd: number;
 	market_margin: number | null;
 	market_total: number | null;

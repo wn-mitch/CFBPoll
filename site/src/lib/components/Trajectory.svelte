@@ -6,7 +6,8 @@
 	// defense. One axis (points vs. an average FBS team).
 	let { points }: { points: TrajectoryPoint[] } = $props();
 
-	const W = 640;
+	// Drawn at the container's pixel width so text stays legible on phones.
+	let W = $state(640);
 	const H = 240;
 	const pad = { l: 36, r: 104, t: 12, b: 26 };
 	const z = 1.645;
@@ -73,7 +74,7 @@
 			><span class="inline-block h-2.5 w-4 rounded-sm" style="background: var(--band-1)"></span>Overall, 90% range</span
 		>
 	</div>
-	<div class="relative">
+	<div class="relative" bind:clientWidth={W}>
 		<svg
 			viewBox="0 0 {W} {H}"
 			class="block h-auto w-full touch-none select-none"

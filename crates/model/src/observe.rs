@@ -74,8 +74,16 @@ pub fn game_observation(
 /// Pregame prediction for one game.
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Prediction {
+    /// Mean of the model's (unbounded) home points. Can be negative in a
+    /// lopsided game; use `home_score` for an expected final score.
     pub home_points: f64,
     pub away_points: f64,
+    /// Expected home score with the floor at zero applied: the mean of
+    /// `max(0, points)` under the predictive distribution.
+    #[serde(default)]
+    pub home_score: f64,
+    #[serde(default)]
+    pub away_score: f64,
     /// Expected home margin.
     pub margin: f64,
     /// Standard deviation of the actual margin (rating uncertainty plus game
@@ -92,6 +100,9 @@ pub fn predict(state: &Gaussian, layout: &Layout, params: &Params, game: &Game) 
     let shift = home_shift(game, params);
     let hp = state.combo_mean(&home) + shift;
     let ap = state.combo_mean(&away) - shift;
+    let points_sd = |row: &Row| (state.combo_var(row) + params.score_sd.powi(2)).sqrt();
+    let home_score = floored_mean(hp, points_sd(&home));
+    let away_score = floored_mean(ap, points_sd(&away));
 
     let mut margin_row = home.clone();
     margin_row.extend(away.iter().map(|&(i, c)| (i, -c)));
@@ -104,12 +115,25 @@ pub fn predict(state: &Gaussian, layout: &Layout, params: &Params, game: &Game) 
     Prediction {
         home_points: hp,
         away_points: ap,
+        home_score,
+        away_score,
         margin,
         margin_sd,
         total: hp + ap,
         total_sd,
         home_win: normal_cdf(margin / margin_sd),
     }
+}
+
+/// Mean of `max(0, X)` for `X ~ N(mean, sd²)`: a score's expectation when
+/// the model's unbounded points are floored at zero.
+pub fn floored_mean(mean: f64, sd: f64) -> f64 {
+    if sd <= 0.0 {
+        return mean.max(0.0);
+    }
+    let z = mean / sd;
+    let pdf = (-0.5 * z * z).exp() / (2.0 * std::f64::consts::PI).sqrt();
+    mean * normal_cdf(z) + sd * pdf
 }
 
 pub fn normal_cdf(z: f64) -> f64 {
@@ -135,6 +159,26 @@ mod tests {
             "near-linear for close games"
         );
         assert_eq!(cap_margin(70.0, f64::INFINITY), 70.0);
+    }
+
+    #[test]
+    fn floored_mean_never_negative_and_matches_tails() {
+        // A heavy underdog's unbounded mean is below zero; the floored
+        // expectation is a small positive score.
+        let m = floored_mean(-2.0, 13.0);
+        assert!(m > 3.0 && m < 6.0, "{m}");
+        // Far from the floor the correction vanishes.
+        assert!((floored_mean(40.0, 13.0) - 40.0).abs() < 0.05);
+        // Never below zero or below the unbounded mean.
+        for mean in [-60.0, -20.0, -1.0, 0.0, 1.0, 20.0] {
+            let f = floored_mean(mean, 13.0);
+            assert!(f >= 0.0 && f >= mean, "mean {mean}: {f}");
+        }
+        // At mean 0 it is sd / sqrt(2π).
+        assert!(
+            (floored_mean(0.0, 10.0) - 10.0 / (2.0 * std::f64::consts::PI).sqrt()).abs() < 1e-12
+        );
+        assert_eq!(floored_mean(-3.0, 0.0), 0.0);
     }
 
     #[test]

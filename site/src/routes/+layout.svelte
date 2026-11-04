@@ -20,7 +20,7 @@
 		<div class="mx-auto flex max-w-6xl flex-wrap items-baseline gap-x-6 gap-y-2 px-4 py-3">
 			<a href="/" class="text-lg font-bold tracking-tight no-underline">CFB Poll</a>
 			<span class="text-sm text-muted">{data.meta.year} · through {data.meta.as_of}</span>
-			<nav class="-mx-1 flex w-full gap-1 overflow-x-auto text-sm sm:ml-auto sm:w-auto" aria-label="Main">
+			<nav class="-mx-1 flex w-full flex-wrap gap-1 text-sm sm:ml-auto sm:w-auto" aria-label="Main">
 				{#each links as l (l.href)}
 					<a
 						href={l.href}

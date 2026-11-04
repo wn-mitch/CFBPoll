@@ -49,6 +49,10 @@ lint:
 site: build-data
     cd site && npm run build
 
+# Browser tests against the built site.
+e2e: site
+    cd site && npm run e2e
+
 # Regenerate the Open Graph image from the built site.
 og: site
     cd site && npm run og

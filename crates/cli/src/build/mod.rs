@@ -1,5 +1,6 @@
 //! `cfbpoll build`: write the site's JSON data for one season.
 
+mod history;
 mod schema;
 mod teams;
 
@@ -39,6 +40,8 @@ pub struct Built<'a> {
     pub order: Vec<usize>,
     /// FBS average overall, offense and defense at the latest snapshot.
     pub avg: (f64, f64, f64),
+    /// Week-by-week standing of each FBS team.
+    pub history: std::collections::HashMap<usize, Vec<schema::WeekPoint>>,
 }
 
 impl Built<'_> {
@@ -130,14 +133,16 @@ pub fn run(cache: &Cache, inputs: &BuildInputs) -> Result<()> {
     );
     let mut order = fbs.clone();
     order.sort_by(|&a, &b| ratings[b].overall.total_cmp(&ratings[a].overall));
-    let built = Built {
+    let mut built = Built {
         season: &season,
         params: &inputs.params,
         run,
         sim,
         order,
         avg,
+        history: Default::default(),
     };
+    built.history = history::by_team(&built);
 
     let out = &inputs.out;
     let mut slugs: Vec<String> = built

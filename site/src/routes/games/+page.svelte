@@ -44,11 +44,19 @@
 							</div>
 							<div class="text-xs text-faint">{shortDate(p.date)}</div>
 						</td>
-						<td class="px-2 py-2 whitespace-nowrap">{fav(p)} <span class="font-semibold">{pct(favP(p))}</span></td>
+						<td class="px-2 py-2 whitespace-nowrap">
+							<div>{fav(p)} <span class="font-semibold">{pct(favP(p))}</span></div>
+							<div class="mt-1 h-1 w-24 overflow-hidden rounded-full bg-border" aria-hidden="true">
+								<div class="h-full rounded-full" style="width: {favP(p) * 100}%; background: var(--series-1)"></div>
+							</div>
+							<div class="mt-1 text-xs text-muted md:hidden">
+								Model {spread(p.margin, p.home, p.away)}{#if p.market_margin !== null}<br />Market {spread(p.market_margin, p.home, p.away)}{/if}
+							</div>
+						</td>
 						<td class="hidden px-2 py-2 text-right whitespace-nowrap text-muted sm:table-cell"
 							>{Math.round(p.away_points)}–{Math.round(p.home_points)}</td
 						>
-						<td class="hidden px-2 py-2 whitespace-nowrap md:table-cell">{spread(p.home_points - p.away_points, p.home, p.away)}</td>
+						<td class="hidden px-2 py-2 whitespace-nowrap md:table-cell">{spread(p.margin, p.home, p.away)}</td>
 						<td class="hidden px-2 py-2 whitespace-nowrap text-muted md:table-cell"
 							>{p.market_margin === null ? '' : spread(p.market_margin, p.home, p.away)}</td
 						>
@@ -72,7 +80,7 @@
 	Scores are listed away–home. The model line is its expected margin; the market is the closing spread.
 </p>
 {#if g.upcoming.length}
-	{@render table(g.upcoming, true)}
+	{@render table(g.upcoming, g.upcoming.some((p) => p.result !== null))}
 {:else}
 	<p class="text-muted">No games left this season.</p>
 {/if}

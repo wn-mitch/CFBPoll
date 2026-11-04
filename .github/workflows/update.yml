@@ -60,6 +60,7 @@ jobs:
           npm run check
           npm run build
           npx playwright install --with-deps chromium
+          npm run e2e
           npm run og
           npm run build
 

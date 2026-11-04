@@ -32,7 +32,7 @@ pub struct Rated {
     pub sd: f64,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct GameRef {
     pub opponent: String,
     pub opponent_slug: Option<String>,
@@ -65,6 +65,23 @@ pub struct RankRow {
     pub schedule_strength: f64,
     /// Expected losses for a 25th-ranked team playing this schedule.
     pub top25_expected_losses: f64,
+    /// Rank and rating after each week, preseason first.
+    pub history: Vec<WeekPoint>,
+}
+
+/// A team's standing after one week's games.
+#[derive(Debug, Clone, Serialize)]
+pub struct WeekPoint {
+    pub label: String,
+    pub rank: usize,
+    /// 90% rank range at that week.
+    pub rank_low: usize,
+    pub rank_high: usize,
+    pub overall: f64,
+    /// Overall change since the previous week; `None` for preseason.
+    pub change: Option<f64>,
+    /// Games played that week, from this team's side.
+    pub games: Vec<GameRef>,
 }
 
 #[derive(Debug, Serialize)]
@@ -132,8 +149,12 @@ pub struct GamePrediction {
     pub away_logo_id: Option<i64>,
     pub neutral: bool,
     pub home_win: f64,
+    /// Expected final scores (floored at zero, so they can understate the
+    /// margin in a mismatch).
     pub home_points: f64,
     pub away_points: f64,
+    /// Expected home margin.
+    pub margin: f64,
     pub margin_sd: f64,
     pub market_margin: Option<f64>,
     pub market_total: Option<f64>,

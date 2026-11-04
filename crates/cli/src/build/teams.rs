@@ -168,6 +168,7 @@ impl Built<'_> {
             last_game,
             schedule_strength: round1(sos),
             top25_expected_losses: round1(top25),
+            history: self.history.get(&t).cloned().unwrap_or_default(),
         }
     }
 
@@ -258,8 +259,9 @@ impl Built<'_> {
             away_logo_id: self.season.teams[g.away].id,
             neutral: g.neutral,
             home_win: round3(p.home_win),
-            home_points: round1(p.home_points),
-            away_points: round1(p.away_points),
+            home_points: round1(p.home_score),
+            away_points: round1(p.away_score),
+            margin: round1(p.margin),
             margin_sd: round1(p.margin_sd),
             market_margin: g.market_margin,
             market_total: g.market_total,

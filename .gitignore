@@ -11,3 +11,5 @@ node_modules/
 .wrangler/
 .env
 /artifacts/params-*.json
+site/test-results
+site/playwright-report

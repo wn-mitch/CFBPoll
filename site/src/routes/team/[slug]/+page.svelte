@@ -2,6 +2,7 @@
 	import Seo from '#lib/components/Seo.svelte';
 	import Trajectory from '#lib/components/Trajectory.svelte';
 	import Logo from '#lib/components/Logo.svelte';
+	import RankChart from '#lib/components/RankChart.svelte';
 	import { pct, record, shortDate, signed } from '#lib/format.ts';
 
 	let { data } = $props();
@@ -93,6 +94,14 @@
 		</section>
 	{/if}
 </div>
+
+{#if r.history.length > 1}
+	<section class="mt-6 rounded-lg border border-border bg-surface p-4">
+		<h2 class="mt-0 mb-1 text-base font-semibold">Rank by week</h2>
+		<p class="mt-0 mb-2 text-xs text-muted">The band is the 90% rank range at each week.</p>
+		<RankChart points={r.history} height={160} />
+	</section>
+{/if}
 
 <section class="mt-6 overflow-x-auto rounded-lg border border-border bg-surface">
 	<h2 class="m-0 px-4 pt-4 pb-2 text-base font-semibold">Schedule</h2>
