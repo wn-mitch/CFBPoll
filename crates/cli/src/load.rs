@@ -19,6 +19,7 @@ fn pseudo_name(class: Class) -> &'static str {
 
 #[derive(Default)]
 struct TeamVotes {
+    id: Option<i64>,
     class: BTreeMap<String, usize>,
     conference: BTreeMap<String, usize>,
 }
@@ -46,11 +47,22 @@ pub fn load_season(cache: &Cache, year: i32) -> Result<Season> {
     // A team's class and conference are its most common labels this season.
     let mut votes: HashMap<String, TeamVotes> = HashMap::new();
     for g in &raw {
-        for (name, class, conf) in [
-            (&g.home_team, &g.home_classification, &g.home_conference),
-            (&g.away_team, &g.away_classification, &g.away_conference),
+        for (name, id, class, conf) in [
+            (
+                &g.home_team,
+                g.home_id,
+                &g.home_classification,
+                &g.home_conference,
+            ),
+            (
+                &g.away_team,
+                g.away_id,
+                &g.away_classification,
+                &g.away_conference,
+            ),
         ] {
             let v = votes.entry(name.clone()).or_default();
+            v.id = Some(id);
             *v.class
                 .entry(class.clone().unwrap_or_default())
                 .or_default() += 1;
@@ -86,6 +98,7 @@ pub fn load_season(cache: &Cache, year: i32) -> Result<Season> {
             name: key.clone(),
             class,
             conference,
+            id: if class.is_rated() { v.id } else { None },
         });
         index.insert(key, teams.len() - 1);
         index.insert(name.clone(), teams.len() - 1);

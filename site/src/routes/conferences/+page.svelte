@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Seo from '#lib/components/Seo.svelte';
 	import { signed } from '#lib/format.ts';
+	import Logo from '#lib/components/Logo.svelte';
 
 	let { data } = $props();
 	const all = $derived(data.rows.flatMap((r) => r.member_ratings));
@@ -19,7 +20,7 @@
 
 <h1 class="mt-0 mb-1 text-2xl font-bold tracking-tight">Conferences</h1>
 <p class="mt-0 mb-5 max-w-[70ch] text-sm text-muted">
-	Ordered by average member rating. Each dot is a team. Every conference starts the season at the same level; only
+	Ordered by average member rating. Each logo is a team, placed at its rating. Every conference starts the season at the same level; only
 	this season's cross-conference games move it, so the ± shows how much those few games pin it down.
 </p>
 
@@ -38,17 +39,18 @@
 				<div class="font-medium">{c.name}</div>
 				<div class="num text-xs text-faint">avg {signed(c.member_average)}</div>
 			</div>
-			<div class="relative h-6">
+			<div class="relative h-7">
 				<div class="absolute top-0 bottom-0 w-px bg-border" style="left: {x(0)}"></div>
 				{#each c.members as m, i (m)}
 					<a
 						href="/team/{c.member_slugs[i]}"
-						class="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2"
-						style="left: {x(c.member_ratings[i])}; background: var(--series-1); border-color: var(--surface)"
+						class="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 hover:z-10 hover:scale-125"
+						style="left: {x(c.member_ratings[i])}"
 						aria-label="{m} {signed(c.member_ratings[i])}"
 						onpointerenter={() => (hover = { team: m, v: c.member_ratings[i] })}
 						onpointerleave={() => (hover = null)}
-					></a>
+						><Logo id={c.member_logo_ids[i]} size={22} /></a
+					>
 				{/each}
 			</div>
 			<div class="num hidden text-right text-xs text-muted sm:block" title="Conference level from cross-conference games">

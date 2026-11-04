@@ -41,6 +41,9 @@ pub struct Team {
     /// Conference this season. `None` for independents and pseudo-teams,
     /// which have no conference level in the model.
     pub conference: Option<String>,
+    /// CFBD team id (used for logos); `None` for pseudo-teams.
+    #[serde(default)]
+    pub id: Option<i64>,
 }
 
 /// Ordinal position of a game in the season, used for weekly snapshots.

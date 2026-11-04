@@ -26,6 +26,7 @@ export interface Record {
 export interface GameRef {
 	opponent: string;
 	opponent_slug: string | null;
+	opponent_logo_id: number | null;
 	site: 'home' | 'away' | 'neutral';
 	points_for: number;
 	points_against: number;
@@ -38,6 +39,7 @@ export interface RankRow {
 	previous_rank: number | null;
 	team: string;
 	slug: string;
+	logo_id: number | null;
 	conference: string | null;
 	record: Record;
 	overall: Rated;
@@ -64,6 +66,7 @@ export interface ScheduleGame {
 	opponent: string;
 	opponent_slug: string | null;
 	opponent_rank: number | null;
+	opponent_logo_id: number | null;
 	site: 'home' | 'away' | 'neutral';
 	conference_game: boolean;
 	result: [number, number] | null;
@@ -98,9 +101,11 @@ export interface GamePrediction {
 	home: string;
 	home_slug: string | null;
 	home_rank: number | null;
+	home_logo_id: number | null;
 	away: string;
 	away_slug: string | null;
 	away_rank: number | null;
+	away_logo_id: number | null;
 	neutral: boolean;
 	home_win: number;
 	home_points: number;
@@ -125,12 +130,14 @@ export interface ConferenceRow {
 	members: string[];
 	member_slugs: string[];
 	member_ratings: number[];
+	member_logo_ids: (number | null)[];
 	nonconference_games: number;
 }
 
 export interface OddsRow extends TeamOdds {
 	team: string;
 	slug: string;
+	logo_id: number | null;
 	conference: string | null;
 	rank: number;
 }

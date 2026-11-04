@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Seo from '#lib/components/Seo.svelte';
 	import Trajectory from '#lib/components/Trajectory.svelte';
+	import Logo from '#lib/components/Logo.svelte';
 	import { pct, record, shortDate, signed } from '#lib/format.ts';
 
 	let { data } = $props();
@@ -16,12 +17,15 @@
 
 <a href="/" class="text-sm text-muted no-underline hover:underline">← Rankings</a>
 <div class="mt-2 mb-6 flex flex-wrap items-end gap-x-8 gap-y-3">
-	<div>
+	<div class="flex items-center gap-4">
+		<Logo id={r.logo_id} size={64} />
+		<div>
 		<div class="text-sm text-muted">
 			{r.conference ?? 'Independent'} · {record(r.record.wins, r.record.losses)}
 			({record(r.record.conf_wins, r.record.conf_losses)} conf)
 		</div>
 		<h1 class="m-0 text-3xl font-bold tracking-tight">{r.team}</h1>
+		</div>
 	</div>
 	<dl class="num m-0 flex flex-wrap gap-x-8 gap-y-2">
 		<div>
@@ -108,7 +112,8 @@
 				<tr class="border-b border-border last:border-0">
 					<td class="px-4 py-2 whitespace-nowrap text-muted">{shortDate(g.date)}</td>
 					<td class="px-2 py-2">
-						<span class="text-faint">{g.site === 'away' ? '@' : g.site === 'neutral' ? 'vs' : ''}</span>
+						<span class="inline-block w-4 text-faint">{g.site === 'away' ? '@' : g.site === 'neutral' ? 'vs' : ''}</span>
+						<Logo id={g.opponent_logo_id} size={18} class="mr-1" />
 						{#if g.opponent_rank && g.opponent_rank <= 25}<span class="text-xs text-faint">{g.opponent_rank}</span>{/if}
 						{#if g.opponent_slug}<a href="/team/{g.opponent_slug}" class="no-underline hover:underline"
 								>{g.opponent}</a

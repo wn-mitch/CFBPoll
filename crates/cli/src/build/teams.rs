@@ -131,6 +131,7 @@ impl Built<'_> {
                 GameRef {
                     opponent: self.season.teams[opp].name.clone(),
                     opponent_slug: self.team_slug(opp),
+                    opponent_logo_id: self.season.teams[opp].id,
                     site: site(g, home),
                     points_for: if home { h } else { a },
                     points_against: if home { a } else { h },
@@ -145,6 +146,7 @@ impl Built<'_> {
             previous_rank: ranks_prev.get(&t).copied(),
             team: team.name.clone(),
             slug: slug(&team.name),
+            logo_id: team.id,
             conference: team.conference.clone(),
             record: self.record(t),
             overall: Rated {
@@ -249,9 +251,11 @@ impl Built<'_> {
             home: self.season.teams[g.home].name.clone(),
             home_slug: self.team_slug(g.home),
             home_rank: self.rank_of(g.home),
+            home_logo_id: self.season.teams[g.home].id,
             away: self.season.teams[g.away].name.clone(),
             away_slug: self.team_slug(g.away),
             away_rank: self.rank_of(g.away),
+            away_logo_id: self.season.teams[g.away].id,
             neutral: g.neutral,
             home_win: round3(p.home_win),
             home_points: round1(p.home_points),
@@ -322,6 +326,7 @@ pub fn team_pages(b: &Built) -> Vec<(String, TeamPage)> {
                         opponent: b.season.teams[opp].name.clone(),
                         opponent_slug: b.team_slug(opp),
                         opponent_rank: b.rank_of(opp),
+                        opponent_logo_id: b.season.teams[opp].id,
                         site: site(g, home),
                         conference_game: g.conference_game,
                         result: g.score.map(|(h, a)| if home { (h, a) } else { (a, h) }),
@@ -440,6 +445,7 @@ pub fn conferences(b: &Built) -> Vec<ConferenceRow> {
                     .map(|&t| slug(&b.season.teams[t].name))
                     .collect(),
                 member_ratings: ratings,
+                member_logo_ids: members.iter().map(|&t| b.season.teams[t].id).collect(),
                 nonconference_games: nonconf,
             }
         })
@@ -456,6 +462,7 @@ pub fn odds(b: &Built) -> Vec<OddsRow> {
             Some(OddsRow {
                 team: b.season.teams[t].name.clone(),
                 slug: slug(&b.season.teams[t].name),
+                logo_id: b.season.teams[t].id,
                 conference: b.season.teams[t].conference.clone(),
                 rank: b.rank_of(t)?,
                 odds: b.odds_out(t)?,

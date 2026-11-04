@@ -36,6 +36,7 @@ pub struct Rated {
 pub struct GameRef {
     pub opponent: String,
     pub opponent_slug: Option<String>,
+    pub opponent_logo_id: Option<i64>,
     /// "home", "away" or "neutral".
     pub site: &'static str,
     pub points_for: f64,
@@ -50,6 +51,8 @@ pub struct RankRow {
     pub previous_rank: Option<usize>,
     pub team: String,
     pub slug: String,
+    /// CFBD team id; the site builds logo URLs from it.
+    pub logo_id: Option<i64>,
     pub conference: Option<String>,
     pub record: Record,
     pub overall: Rated,
@@ -81,6 +84,7 @@ pub struct ScheduleGame {
     pub opponent: String,
     pub opponent_slug: Option<String>,
     pub opponent_rank: Option<usize>,
+    pub opponent_logo_id: Option<i64>,
     pub site: &'static str,
     pub conference_game: bool,
     /// Final score from this team's side, when played.
@@ -121,9 +125,11 @@ pub struct GamePrediction {
     pub home: String,
     pub home_slug: Option<String>,
     pub home_rank: Option<usize>,
+    pub home_logo_id: Option<i64>,
     pub away: String,
     pub away_slug: Option<String>,
     pub away_rank: Option<usize>,
+    pub away_logo_id: Option<i64>,
     pub neutral: bool,
     pub home_win: f64,
     pub home_points: f64,
@@ -152,6 +158,7 @@ pub struct ConferenceRow {
     pub members: Vec<String>,
     pub member_slugs: Vec<String>,
     pub member_ratings: Vec<f64>,
+    pub member_logo_ids: Vec<Option<i64>>,
     pub nonconference_games: usize,
 }
 
@@ -159,6 +166,7 @@ pub struct ConferenceRow {
 pub struct OddsRow {
     pub team: String,
     pub slug: String,
+    pub logo_id: Option<i64>,
     pub conference: Option<String>,
     pub rank: usize,
     #[serde(flatten)]

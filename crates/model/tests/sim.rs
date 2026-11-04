@@ -16,6 +16,7 @@ fn season(championship_played: bool) -> Season {
                 name: format!("{c} {i}"),
                 class: Class::Fbs,
                 conference: Some(c.into()),
+                id: None,
             });
         }
     }

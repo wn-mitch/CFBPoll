@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Seo from '#lib/components/Seo.svelte';
+	import Logo from '#lib/components/Logo.svelte';
 	import { pct } from '#lib/format.ts';
 
 	let { data } = $props();
@@ -37,7 +38,8 @@
 			{#each rows as r (r.slug)}
 				<tr class="border-b border-border last:border-0">
 					<td class="px-3 py-1.5">
-						<span class="text-xs text-faint">{r.rank}</span>
+						<span class="inline-block w-6 text-xs text-faint">{r.rank}</span>
+						<Logo id={r.logo_id} size={18} class="mr-1" />
 						<a href="/team/{r.slug}" class="no-underline hover:underline">{r.team}</a>
 						<span class="hidden text-xs text-faint sm:inline">{r.conference ?? 'Independent'}</span>
 					</td>

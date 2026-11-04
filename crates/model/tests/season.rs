@@ -12,6 +12,7 @@ fn team(name: &str, class: Class, conf: Option<&str>) -> Team {
         name: name.into(),
         class,
         conference: conf.map(Into::into),
+        id: None,
     }
 }
 

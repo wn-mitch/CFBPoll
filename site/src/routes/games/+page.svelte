@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Seo from '#lib/components/Seo.svelte';
+	import Logo from '#lib/components/Logo.svelte';
 	import { pct, shortDate, spread } from '#lib/format.ts';
 	import type { GamePrediction } from '#lib/types.ts';
 
@@ -30,10 +31,14 @@
 				{#each list as p (p.id)}
 					<tr class="border-b border-border last:border-0">
 						<td class="px-3 py-2">
-							<div>
+							<div class="flex items-center gap-1.5">
+								<Logo id={p.away_logo_id} size={18} />
 								{#if p.away_rank && p.away_rank <= 25}<span class="text-xs text-faint">{p.away_rank}</span>{/if}
 								{#if p.away_slug}<a class="no-underline hover:underline" href="/team/{p.away_slug}">{p.away}</a>{:else}{p.away}{/if}
-								<span class="text-faint">{p.neutral ? 'vs' : '@'}</span>
+							</div>
+							<div class="flex items-center gap-1.5">
+								<Logo id={p.home_logo_id} size={18} />
+								<span class="text-xs text-faint">{p.neutral ? 'vs' : '@'}</span>
 								{#if p.home_rank && p.home_rank <= 25}<span class="text-xs text-faint">{p.home_rank}</span>{/if}
 								{#if p.home_slug}<a class="no-underline hover:underline" href="/team/{p.home_slug}">{p.home}</a>{:else}{p.home}{/if}
 							</div>

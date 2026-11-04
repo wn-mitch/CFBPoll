@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Seo from '#lib/components/Seo.svelte';
 	import IntervalBar from '#lib/components/IntervalBar.svelte';
+	import Logo from '#lib/components/Logo.svelte';
 	import { record, signed } from '#lib/format.ts';
 
 	let { data } = $props();
@@ -61,8 +62,13 @@
 						{/if}
 					</td>
 					<td class="px-2 py-2">
-						<a href="/team/{r.slug}" class="font-medium no-underline hover:underline">{r.team}</a>
-						<div class="text-xs text-faint">{r.conference ?? 'Independent'}</div>
+						<div class="flex items-center gap-2.5">
+							<Logo id={r.logo_id} size={24} />
+							<div>
+								<a href="/team/{r.slug}" class="font-medium no-underline hover:underline">{r.team}</a>
+								<div class="text-xs text-faint">{r.conference ?? 'Independent'}</div>
+							</div>
+						</div>
 					</td>
 					<td class="px-2 py-2 whitespace-nowrap">
 						{record(r.record.wins, r.record.losses)}
