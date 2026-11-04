@@ -10,3 +10,4 @@ node_modules/
 /site/playwright-report/
 .wrangler/
 .env
+/artifacts/params-*.json

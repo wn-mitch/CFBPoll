@@ -8,7 +8,7 @@ use cfbd::Cache;
 use model::data::Season;
 use model::layout::TeamPrior;
 use model::params::Params;
-use model::prior::{cross_validate, Blocks, Example, PriorModel, GROUPS};
+use model::prior::{cross_validate, Blocks, CvRow, Example, PriorModel, GROUPS};
 use std::collections::HashMap;
 use std::path::Path;
 
@@ -139,8 +139,13 @@ pub fn run(
         "{:<34} {:>7} {:>8.3} {:>8.3}",
         "fresh start (class mean)", "-", o, d
     );
+    let mut report = vec![CvRow {
+        name: "Division average (fresh start)".into(),
+        rmse_o: o,
+        rmse_d: d,
+    }];
     let variants = [
-        ("last season only", NONE),
+        ("Last season's rating", NONE),
         (
             "+ returning production",
             Blocks {
@@ -169,6 +174,11 @@ pub fn run(
     for (name, blocks) in variants {
         let (l, (o, d)) = best_lambda(blocks);
         println!("{name:<34} {l:>7} {o:>8.3} {d:>8.3}");
+        report.push(CvRow {
+            name: name.to_string(),
+            rmse_o: o,
+            rmse_d: d,
+        });
         results.push((blocks, l, o + d));
     }
 
@@ -190,6 +200,7 @@ pub fn run(
     let (cv_o, cv_d) = rmse(&ex, &cross_validate(&ex, blocks, l));
     model.sd_o = cv_o;
     model.sd_d = cv_d;
+    model.report = report;
     println!("\nposition contribution (full continuity vs none, points):");
     println!("{:<6} {:>8} {:>8}", "group", "offense", "defense");
     for (g, name) in GROUPS.iter().enumerate() {

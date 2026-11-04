@@ -1,0 +1,68 @@
+name: Update and deploy
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+  schedule:
+    # Sunday, Monday, Wednesday and Friday mornings (UTC) during the season.
+    - cron: "0 12 * 1,8-12 0,1,3,5"
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@1.91.1
+        with:
+          components: clippy, rustfmt
+
+      - uses: Swatinem/rust-cache@v2
+
+      # Completed seasons never change; only the current season is refetched.
+      - name: Restore raw data
+        uses: actions/cache@v4
+        with:
+          path: data/raw
+          key: cfbd-raw-${{ github.run_id }}
+          restore-keys: cfbd-raw-
+
+      - name: Test
+        run: cargo test --workspace --release
+
+      - name: Fetch data
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+        run: |
+          year=$(cargo run --release --quiet -p cfbpoll -- season)
+          cargo run --release --quiet -p cfbpoll -- fetch --years "$((year - 1))-$year"
+
+      - name: Build data
+        run: cargo run --release --quiet -p cfbpoll -- build --out site/static/data
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Build site
+        working-directory: site
+        run: |
+          npm ci
+          npm test
+          npm run check
+          npm run build
+
+      - name: Deploy
+        working-directory: site
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx wrangler deploy

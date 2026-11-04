@@ -3,7 +3,7 @@
 
 use crate::load::load_season;
 use crate::prior::{load_model, loso_priors, union_years, PriorData};
-use anyhow::Result;
+use anyhow::{Context, Result};
 use cfbd::Cache;
 use model::data::{Class, Game, Season};
 use model::layout::TeamPrior;
@@ -95,7 +95,7 @@ pub fn run(
     years: &[i32],
     params: &Params,
     prior: Option<&Path>,
-    json: bool,
+    out: Option<&Path>,
 ) -> Result<()> {
     let seasons: Vec<Season> = years
         .iter()
@@ -152,13 +152,32 @@ pub fn run(
         }
     }
 
-    if json {
-        let out: Vec<_> = total
-            .iter()
-            .map(|((m, s), c)| (m.clone(), *s, c.summary()))
-            .collect();
-        println!("{}", serde_json::to_string_pretty(&out)?);
-        return Ok(());
+    if let Some(path) = out {
+        #[derive(Serialize)]
+        struct Row {
+            model: String,
+            slice: Slice,
+            summary: Summary,
+        }
+        #[derive(Serialize)]
+        struct Accuracy {
+            years: String,
+            rows: Vec<Row>,
+        }
+        let acc = Accuracy {
+            years: format!("{}–{}", years[0], years[years.len() - 1]),
+            rows: total
+                .iter()
+                .map(|((m, s), c)| Row {
+                    model: m.clone(),
+                    slice: *s,
+                    summary: c.summary(),
+                })
+                .collect(),
+        };
+        let text = serde_json::to_string_pretty(&acc)?;
+        std::fs::write(path, text + "\n").with_context(|| format!("writing {}", path.display()))?;
+        eprintln!("wrote {}", path.display());
     }
     for (year, cards) in &by_year {
         println!("\n== {year}");

@@ -1,0 +1,7 @@
+{
+	"name": "cfbpoll",
+	"compatibility_date": "2026-10-01",
+	"assets": { "directory": "build", "not_found_handling": "404-page" },
+	// custom_domain lets wrangler create the DNS record and certificate itself.
+	"routes": [{ "pattern": "cfb.alpacasoft.dev", "custom_domain": true }]
+}

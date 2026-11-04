@@ -1,4 +1,6 @@
+mod audit;
 mod backtest;
+mod build;
 mod coverage;
 mod features;
 mod fetch;
@@ -48,9 +50,9 @@ enum Cmd {
         /// Roster-churn prior model (JSON) to also score with priors.
         #[arg(long)]
         prior: Option<PathBuf>,
-        /// Print combined summaries as JSON.
+        /// Also write combined summaries to this JSON file.
         #[arg(long)]
-        json: bool,
+        out: Option<PathBuf>,
     },
     /// Fit hyperparameters on training seasons.
     Fit {
@@ -93,6 +95,32 @@ enum Cmd {
         #[arg(long, default_value_t = 25)]
         top: usize,
     },
+    /// Compare human polls with the model, week by week.
+    Audit {
+        #[arg(long, value_parser = season::parse_years)]
+        years: season::Years,
+        #[arg(long)]
+        params: Option<PathBuf>,
+        #[arg(long)]
+        prior: Option<PathBuf>,
+        #[arg(long, default_value = "artifacts/bias.json")]
+        out: PathBuf,
+    },
+    /// Write the site's JSON data for a season.
+    Build {
+        #[arg(long)]
+        year: Option<i32>,
+        /// Directory holding params.json, prior.json, accuracy.json, bias.json.
+        #[arg(long, default_value = "artifacts")]
+        artifacts: PathBuf,
+        #[arg(long, default_value = "site/static/data")]
+        out: PathBuf,
+        #[arg(long, default_value_t = 10_000)]
+        draws: usize,
+        /// Run with fresh-start priors even if artifacts/prior.json exists.
+        #[arg(long)]
+        no_prior: bool,
+    },
     /// Print the FBS ranking after the latest completed game.
     Rank {
         #[arg(long)]
@@ -102,6 +130,8 @@ enum Cmd {
         #[arg(long, default_value_t = 25)]
         top: usize,
     },
+    /// Print the current season's year.
+    Season,
     /// Print cached row counts per dataset and season.
     Coverage {
         #[arg(long, value_parser = season::parse_years)]
@@ -127,10 +157,10 @@ fn main() -> Result<()> {
             years,
             params,
             prior,
-            json,
+            out,
         } => {
             let params = load_params(params.as_deref())?;
-            backtest::run(&cache, &years.0, &params, prior.as_deref(), json)
+            backtest::run(&cache, &years.0, &params, prior.as_deref(), out.as_deref())
         }
         Cmd::Fit {
             years,
@@ -170,6 +200,37 @@ fn main() -> Result<()> {
                 top,
             )
         }
+        Cmd::Audit {
+            years,
+            params,
+            prior,
+            out,
+        } => {
+            let params = load_params(params.as_deref())?;
+            audit::run(&cache, &years.0, &params, prior.as_deref(), &out)
+        }
+        Cmd::Build {
+            year,
+            artifacts,
+            out,
+            draws,
+            no_prior,
+        } => {
+            let params = load_params(Some(&artifacts.join("params.json")))?;
+            let prior_path = artifacts.join("prior.json");
+            let prior = (!no_prior && prior_path.exists()).then_some(prior_path);
+            build::run(
+                &cache,
+                &build::BuildInputs {
+                    year: year.unwrap_or_else(season::current_season),
+                    params,
+                    prior,
+                    artifacts,
+                    out,
+                    draws,
+                },
+            )
+        }
         Cmd::Rank { year, params, top } => {
             let params = load_params(params.as_deref())?;
             rank::run(
@@ -178,6 +239,10 @@ fn main() -> Result<()> {
                 &params,
                 top,
             )
+        }
+        Cmd::Season => {
+            println!("{}", season::current_season());
+            Ok(())
         }
         Cmd::Coverage { years } => coverage::run(&cache, &years.0),
     }

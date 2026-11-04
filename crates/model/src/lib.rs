@@ -1,5 +1,6 @@
 //! Rating model: pure computation, no I/O.
 
+pub mod bias;
 pub mod data;
 pub mod fit;
 pub mod kalman;

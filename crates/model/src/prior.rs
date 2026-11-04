@@ -109,6 +109,10 @@ fn raw(f: &Features, b: Blocks) -> Vec<Option<f64>> {
 /// Fitted prior model.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PriorModel {
+    /// Cross-validated error of each feature set tried when this model was
+    /// chosen, for publication.
+    #[serde(default)]
+    pub report: Vec<CvRow>,
     /// Seasons whose examples trained this model.
     #[serde(default)]
     pub train_years: Vec<i32>,
@@ -125,6 +129,14 @@ pub struct PriorModel {
     /// Residual sd (cross-validated when produced by `cross_validate`).
     pub sd_o: f64,
     pub sd_d: f64,
+}
+
+/// Leave-one-season-out error of one feature set, in points.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CvRow {
+    pub name: String,
+    pub rmse_o: f64,
+    pub rmse_d: f64,
 }
 
 /// One training example: features and the season's end-of-season
@@ -214,6 +226,7 @@ impl PriorModel {
         train_years.sort();
         train_years.dedup();
         PriorModel {
+            report: Vec::new(),
             train_years,
             blocks,
             lambda,
