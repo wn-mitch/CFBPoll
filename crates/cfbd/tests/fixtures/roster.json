@@ -1,0 +1,40 @@
+[
+  {
+    "id": "102597",
+    "firstName": "Will",
+    "lastName": "Rogers",
+    "team": "Washington",
+    "weight": 216,
+    "height": 74,
+    "jersey": 7,
+    "year": 4,
+    "position": "QB",
+    "homeCity": "Brandon",
+    "homeState": "MS",
+    "homeCountry": "USA",
+    "homeLatitude": 32.2731475,
+    "homeLongitude": -89.9868058,
+    "homeCountyFIPS": "28121",
+    "recruitIds": []
+  },
+  {
+    "id": "107494",
+    "firstName": "Trey",
+    "lastName": "Sanders",
+    "team": "TCU",
+    "weight": 215,
+    "height": 72,
+    "jersey": 2,
+    "year": 4,
+    "position": "RB",
+    "homeCity": "Port Saint Joe",
+    "homeState": "FL",
+    "homeCountry": "USA",
+    "homeLatitude": 29.8118757,
+    "homeLongitude": -85.302974,
+    "homeCountyFIPS": "12045",
+    "recruitIds": [
+      "122283"
+    ]
+  }
+]

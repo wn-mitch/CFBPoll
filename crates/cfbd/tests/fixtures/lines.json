@@ -1,0 +1,80 @@
+[
+  {
+    "id": 401635575,
+    "season": 2024,
+    "seasonType": "regular",
+    "week": 7,
+    "startDate": "2024-10-12T19:30:00.000Z",
+    "homeTeamId": 221,
+    "homeTeam": "Pittsburgh",
+    "homeConference": "ACC",
+    "homeClassification": "fbs",
+    "homeScore": 17,
+    "awayTeamId": 25,
+    "awayTeam": "California",
+    "awayConference": "ACC",
+    "awayClassification": "fbs",
+    "awayScore": 15,
+    "lines": [
+      {
+        "provider": "DraftKings",
+        "spread": -3.5,
+        "formattedSpread": "Pittsburgh -3.5",
+        "spreadOpen": -2.5,
+        "overUnder": 57.5,
+        "overUnderOpen": null,
+        "homeMoneyline": -166,
+        "awayMoneyline": 140
+      },
+      {
+        "provider": "Bovada",
+        "spread": -3.5,
+        "formattedSpread": "Pittsburgh -3.5",
+        "spreadOpen": -4.5,
+        "overUnder": 57.5,
+        "overUnderOpen": 59,
+        "homeMoneyline": -170,
+        "awayMoneyline": 145
+      },
+      {
+        "provider": "ESPN Bet",
+        "spread": -3.5,
+        "formattedSpread": "Pittsburgh -3.5",
+        "spreadOpen": -3.5,
+        "overUnder": 56.5,
+        "overUnderOpen": 59.5,
+        "homeMoneyline": -170,
+        "awayMoneyline": 145
+      }
+    ]
+  },
+  {
+    "id": 401654609,
+    "season": 2024,
+    "seasonType": "regular",
+    "week": 10,
+    "startDate": "2024-11-02T16:00:00.000Z",
+    "homeTeamId": 2523,
+    "homeTeam": "Robert Morris",
+    "homeConference": "NEC",
+    "homeClassification": "fcs",
+    "homeScore": 6,
+    "awayTeamId": 2771,
+    "awayTeam": "Merrimack",
+    "awayConference": "FCS Independents",
+    "awayClassification": "fcs",
+    "awayScore": 0,
+    "lines": [
+      {
+        "provider": "ESPN Bet",
+        "spread": 1.5,
+        "formattedSpread": "Merrimack -1.5",
+        "spreadOpen": null,
+        "overUnder": 48.5,
+        "overUnderOpen": null,
+        "homeMoneyline": null,
+        "awayMoneyline": null
+      }
+    ]
+  }
+]

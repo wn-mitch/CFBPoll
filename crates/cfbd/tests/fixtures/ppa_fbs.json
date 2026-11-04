@@ -1,0 +1,52 @@
+[
+  {
+    "gameId": 401643699,
+    "season": 2024,
+    "week": 1,
+    "seasonType": "regular",
+    "team": "Air Force",
+    "conference": "Mountain West",
+    "opponent": "Merrimack",
+    "offense": {
+      "overall": 0.01,
+      "passing": 0.06,
+      "rushing": -0.01,
+      "firstDown": -0.25,
+      "secondDown": 0.19,
+      "thirdDown": 0.1
+    },
+    "defense": {
+      "overall": -0.24,
+      "passing": -0.04,
+      "rushing": -0.43,
+      "firstDown": -0.46,
+      "secondDown": -0.18,
+      "thirdDown": -0.18
+    }
+  },
+  {
+    "gameId": 401628455,
+    "season": 2024,
+    "week": 1,
+    "seasonType": "regular",
+    "team": "Akron",
+    "conference": "Mid-American",
+    "opponent": "Ohio State",
+    "offense": {
+      "overall": -0.25,
+      "passing": -0.11,
+      "rushing": -0.24,
+      "firstDown": -0.09,
+      "secondDown": -0.61,
+      "thirdDown": -0.06
+    },
+    "defense": {
+      "overall": 0.39,
+      "passing": 0.38,
+      "rushing": 0.4,
+      "firstDown": 0.3,
+      "secondDown": 0.39,
+      "thirdDown": 1.03
+    }
+  }
+]

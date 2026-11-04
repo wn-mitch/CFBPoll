@@ -1,0 +1,26 @@
+[
+  {
+    "season": 2024,
+    "firstName": "Julian",
+    "lastName": "Humphrey",
+    "position": "CB",
+    "origin": "Georgia",
+    "destination": null,
+    "transferDate": "2024-01-03T00:27:00.000Z",
+    "rating": null,
+    "stars": 4,
+    "eligibility": "Immediate"
+  },
+  {
+    "season": 2024,
+    "firstName": "Danny",
+    "lastName": "Saili",
+    "position": "DL",
+    "origin": "BYU",
+    "destination": "Arkansas",
+    "transferDate": "2024-05-01T01:55:00.000Z",
+    "rating": 0.87,
+    "stars": 3,
+    "eligibility": "Immediate"
+  }
+]

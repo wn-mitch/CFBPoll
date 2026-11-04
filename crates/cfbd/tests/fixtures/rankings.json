@@ -1,0 +1,39 @@
+[
+  {
+    "season": 2024,
+    "seasonType": "regular",
+    "week": 13,
+    "polls": [
+      {
+        "poll": "FCS Coaches Poll",
+        "isFinal": null,
+        "ranks": [
+          {
+            "rank": 21,
+            "teamId": 108,
+            "school": "Harvard",
+            "conference": "Ivy",
+            "firstPlaceVotes": 0,
+            "points": 130
+          },
+          {
+            "rank": 8,
+            "teamId": 70,
+            "school": "Idaho",
+            "conference": "Big Sky",
+            "firstPlaceVotes": 0,
+            "points": 435
+          },
+          {
+            "rank": 12,
+            "teamId": 2000,
+            "school": "Abilene Christian",
+            "conference": "UAC",
+            "firstPlaceVotes": 0,
+            "points": 356
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,5 +1,8 @@
+mod backtest;
 mod coverage;
 mod fetch;
+mod load;
+mod rank;
 mod season;
 
 use anyhow::Result;
@@ -31,6 +34,26 @@ enum Cmd {
         #[arg(long)]
         force: bool,
     },
+    /// Score out-of-sample forecasts against baselines.
+    Backtest {
+        #[arg(long, value_parser = season::parse_years)]
+        years: season::Years,
+        /// Model parameters (JSON). Defaults to built-in starting values.
+        #[arg(long)]
+        params: Option<PathBuf>,
+        /// Print combined summaries as JSON.
+        #[arg(long)]
+        json: bool,
+    },
+    /// Print the FBS ranking after the latest completed game.
+    Rank {
+        #[arg(long)]
+        year: Option<i32>,
+        #[arg(long)]
+        params: Option<PathBuf>,
+        #[arg(long, default_value_t = 25)]
+        top: usize,
+    },
     /// Print cached row counts per dataset and season.
     Coverage {
         #[arg(long, value_parser = season::parse_years)]
@@ -52,6 +75,35 @@ fn main() -> Result<()> {
                 .unwrap_or_else(|| vec![season::current_season()]);
             fetch::run(&cache, &years, stale_hours, force)
         }
+        Cmd::Backtest {
+            years,
+            params,
+            json,
+        } => {
+            let params = load_params(params.as_deref())?;
+            backtest::run(&cache, &years.0, &params, json)
+        }
+        Cmd::Rank { year, params, top } => {
+            let params = load_params(params.as_deref())?;
+            rank::run(
+                &cache,
+                year.unwrap_or_else(season::current_season),
+                &params,
+                top,
+            )
+        }
         Cmd::Coverage { years } => coverage::run(&cache, &years.0),
+    }
+}
+
+fn load_params(path: Option<&std::path::Path>) -> Result<model::params::Params> {
+    use anyhow::Context;
+    match path {
+        None => Ok(model::params::Params::default()),
+        Some(p) => {
+            let text =
+                std::fs::read_to_string(p).with_context(|| format!("reading {}", p.display()))?;
+            serde_json::from_str(&text).with_context(|| format!("parsing {}", p.display()))
+        }
     }
 }
