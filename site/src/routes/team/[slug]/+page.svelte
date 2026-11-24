@@ -43,11 +43,15 @@
 		</div>
 		<div>
 			<dt class="text-xs text-muted">Offense</dt>
-			<dd class="m-0 text-2xl font-semibold">{signed(r.offense.value)}</dd>
+			<dd class="m-0 text-2xl font-semibold">
+				{signed(r.offense.value)} <span class="text-sm font-normal text-faint">#{r.offense_rank}</span>
+			</dd>
 		</div>
 		<div>
 			<dt class="text-xs text-muted">Defense</dt>
-			<dd class="m-0 text-2xl font-semibold">{signed(r.defense.value)}</dd>
+			<dd class="m-0 text-2xl font-semibold">
+				{signed(r.defense.value)} <span class="text-sm font-normal text-faint">#{r.defense_rank}</span>
+			</dd>
 		</div>
 	</dl>
 </div>

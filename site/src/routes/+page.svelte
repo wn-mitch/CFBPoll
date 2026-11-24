@@ -6,27 +6,68 @@
 	import RankChart from '#lib/components/RankChart.svelte';
 	import WeekLog from '#lib/components/WeekLog.svelte';
 	import { record, signed } from '#lib/format.ts';
+	import { renderTop25, shareImage, type ShareEntry } from '#lib/share.ts';
 	import type { RankRow } from '#lib/types.ts';
 
 	let { data } = $props();
 	const z = 1.645;
+	const views = [
+		{ key: 'overall', label: 'Overall', title: 'Top 25' },
+		{ key: 'offense', label: 'Offense', title: 'Top 25 offenses' },
+		{ key: 'defense', label: 'Defense', title: 'Top 25 defenses' }
+	] as const;
+	let view = $state<(typeof views)[number]['key']>('overall');
 	let conference = $state('All');
+	let query = $state('');
 	const conferences = $derived([
 		'All',
 		...[...new Set(data.rows.map((r) => r.conference ?? 'Independent'))].sort((a, b) => a.localeCompare(b))
 	]);
+	const move = (r: RankRow) => (r.previous_rank === null ? 0 : r.previous_rank - r.rank);
+	// Every team in the selected ranking, best first. Offense and defense
+	// ranks have no weekly history, so they carry no movement.
+	const ranked = $derived.by((): ShareEntry[] => {
+		if (view === 'overall') return data.rows.map((r) => ({ row: r, rank: r.rank, move: move(r), rating: r.overall }));
+		const rank = (r: RankRow) => (view === 'offense' ? r.offense_rank : r.defense_rank);
+		return data.rows
+			.map((r) => ({ row: r, rank: rank(r), move: 0, rating: r[view] }))
+			.sort((a, b) => a.rank - b.rank || a.row.rank - b.row.rank);
+	});
+	const needle = $derived(query.trim().toLowerCase());
 	const rows = $derived(
-		conference === 'All' ? data.rows : data.rows.filter((r) => (r.conference ?? 'Independent') === conference)
+		ranked.filter(
+			(e) =>
+				(conference === 'All' || (e.row.conference ?? 'Independent') === conference) &&
+				(!needle || e.row.team.toLowerCase().includes(needle))
+		)
 	);
-	const min = $derived(Math.floor(Math.min(...data.rows.map((r) => r.overall.value - z * r.overall.sd)) / 10) * 10);
-	const max = $derived(Math.ceil(Math.max(...data.rows.map((r) => r.overall.value + z * r.overall.sd)) / 10) * 10);
+	const filtered = $derived(conference !== 'All' || needle !== '');
+	const min = $derived(Math.floor(Math.min(...ranked.map((e) => e.rating.value - z * e.rating.sd)) / 10) * 10);
+	const max = $derived(Math.ceil(Math.max(...ranked.map((e) => e.rating.value + z * e.rating.sd)) / 10) * 10);
 	const axis = $derived.by(() => {
 		const t: number[] = [];
-		for (let v = Math.ceil(min / 40) * 40; v <= max; v += 40) t.push(v);
+		const step = view === 'overall' ? 40 : 20;
+		for (let v = Math.ceil(min / step) * step; v <= max; v += step) t.push(v);
 		return t;
 	});
 	const pos = (v: number) => `${(100 * (v - min)) / (max - min)}%`;
-	const move = (r: RankRow) => (r.previous_rank === null ? 0 : r.previous_rank - r.rank);
+
+	let sharing = $state(false);
+	let shareError = $state('');
+	async function share() {
+		const v = views.find((x) => x.key === view)!;
+		sharing = true;
+		shareError = '';
+		try {
+			const blob = await renderTop25(ranked, v.title, data.meta);
+			await shareImage(blob, `cfb-poll-${v.key}-top-25-${data.meta.year}.png`, `CFB Poll ${v.title}`);
+		} catch (e) {
+			shareError = 'Could not create the image.';
+			console.error(e);
+		} finally {
+			sharing = false;
+		}
+	}
 
 	const open = new SvelteSet<string>();
 	function toggle(slug: string) {
@@ -43,16 +84,37 @@
 
 <Seo />
 
-<div class="mb-6 flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
-	<div>
+<div class="mb-5">
 		<h1 class="m-0 text-2xl font-bold tracking-tight">Who is actually best</h1>
 		<p class="mt-1.5 mb-0 max-w-[64ch] text-sm leading-relaxed text-muted">
 			Rating is the expected margin against an average FBS team on a neutral field; the bar is its 90% range.
 			The rank range is where a team lands in 90% of plausible worlds. Click a row for its week-by-week movement. No preseason reputation, no conference bonus.
 			<a href="/method" class="underline decoration-border underline-offset-2 hover:decoration-current">How it works</a>
 		</p>
-	</div>
-	<label class="flex items-center gap-2 text-sm text-muted">
+</div>
+
+<div class="mb-3 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm">
+	<input
+		type="search"
+		bind:value={query}
+		placeholder="Search teams"
+		aria-label="Search teams"
+		class="w-full rounded-md border border-border bg-surface px-3 py-1.5 text-text placeholder:text-faint hover:border-faint focus-visible:border-accent sm:w-56"
+	/>
+	<fieldset class="m-0 flex rounded-md border border-border bg-surface p-0.5">
+		<legend class="sr-only">Rank by</legend>
+		{#each views as v (v.key)}
+			<label
+				class="cursor-pointer rounded px-2.5 py-1 has-checked:bg-surface-2 has-checked:font-semibold has-checked:text-text has-focus-visible:outline-2 has-focus-visible:outline-accent {view ===
+				v.key
+					? ''
+					: 'text-muted hover:text-text'}"
+			>
+				<input type="radio" name="view" value={v.key} bind:group={view} class="sr-only" />{v.label}
+			</label>
+		{/each}
+	</fieldset>
+	<label class="flex items-center gap-2 text-muted">
 		Conference
 		<select
 			bind:value={conference}
@@ -61,6 +123,15 @@
 			{#each conferences as c (c)}<option value={c}>{c}</option>{/each}
 		</select>
 	</label>
+	{#if shareError}<span class="text-down" role="alert">{shareError}</span>{/if}
+	<button
+		type="button"
+		class="rounded-md border border-border bg-surface px-3 py-1.5 text-sm font-medium hover:border-faint hover:bg-surface-2 disabled:opacity-60 sm:ml-auto"
+		onclick={share}
+		disabled={sharing}
+	>
+		{sharing ? 'Creating image…' : `Share ${views.find((x) => x.key === view)!.title.toLowerCase()} image`}
+	</button>
 </div>
 
 <div class="rounded-lg border border-border bg-surface">
@@ -70,7 +141,7 @@
 				<th class="w-16 py-2.5 pr-1 pl-3 font-medium sm:w-20">Rank</th>
 				<th class="px-2 py-2.5 font-medium">Team</th>
 				<th class="hidden px-2 py-2.5 font-medium sm:table-cell">Record</th>
-				<th class="px-2 py-2.5 text-right font-medium">Rating</th>
+				<th class="px-2 py-2.5 text-right font-medium">{view === 'overall' ? 'Rating' : views.find((x) => x.key === view)!.label}</th>
 				<th class="hidden w-[20%] px-3 py-2.5 font-medium md:table-cell">
 					<span class="sr-only">Rating with 90% range</span>
 					<div class="relative h-3.5" aria-hidden="true">
@@ -87,10 +158,11 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each rows as r (r.slug)}
-				{@const m = move(r)}
+			{#each rows as e (e.row.slug)}
+				{@const r = e.row}
+				{@const m = e.move}
 				{@const expanded = open.has(r.slug)}
-				{#if conference === 'All' && r.rank === 26}
+				{#if !filtered && e.rank === 26}
 					<tr aria-hidden="true">
 						<td colspan="10" class="border-b border-border bg-surface-2 px-3 py-1 text-[11px] font-medium tracking-wide text-faint uppercase">
 							Outside the top 25
@@ -105,7 +177,7 @@
 				>
 					<td class="py-2.5 pr-1 pl-3 align-top">
 						<div class="flex items-baseline gap-1.5">
-							<span class="text-base leading-tight font-semibold">{r.rank}</span>
+							<span class="text-base leading-tight font-semibold">{e.rank}</span>
 							{#if m !== 0}
 								<span class="text-xs {m > 0 ? 'text-up' : 'text-down'}"
 									><span aria-hidden="true">{m > 0 ? '▲' : '▼'}</span><span class="sr-only"
@@ -114,7 +186,11 @@
 								>
 							{/if}
 						</div>
-						<div class="text-xs text-faint" title="90% rank range">{r.rank_low}–{r.rank_high}</div>
+						{#if view === 'overall'}
+							<div class="text-xs text-faint" title="90% rank range">{r.rank_low}–{r.rank_high}</div>
+						{:else}
+							<div class="text-xs text-faint" title="Overall rank">#{r.rank} overall</div>
+						{/if}
 					</td>
 					<td class="px-2 py-2.5">
 						<div class="flex items-center gap-2.5">
@@ -134,12 +210,18 @@
 						<span class="text-xs text-faint">({record(r.record.conf_wins, r.record.conf_losses)})</span>
 					</td>
 					<td class="px-2 py-2.5 text-right whitespace-nowrap">
-						<div class="font-semibold">{signed(r.overall.value)}</div>
-						<div class="text-xs text-faint">±{(z * r.overall.sd).toFixed(1)}</div>
+						<div class="font-semibold">{signed(e.rating.value)}</div>
+						<div class="text-xs text-faint">±{(z * e.rating.sd).toFixed(1)}</div>
 					</td>
-					<td class="hidden px-3 py-2.5 md:table-cell"><IntervalBar value={r.overall.value} sd={r.overall.sd} {min} {max} /></td>
-					<td class="hidden px-2 py-2.5 text-right lg:table-cell">{signed(r.offense.value)}</td>
-					<td class="hidden px-2 py-2.5 text-right lg:table-cell">{signed(r.defense.value)}</td>
+					<td class="hidden px-3 py-2.5 md:table-cell"><IntervalBar value={e.rating.value} sd={e.rating.sd} {min} {max} /></td>
+					<td class="hidden px-2 py-2.5 text-right lg:table-cell">
+						<div>{signed(r.offense.value)}</div>
+						<div class="text-xs text-faint">#{r.offense_rank}</div>
+					</td>
+					<td class="hidden px-2 py-2.5 text-right lg:table-cell">
+						<div>{signed(r.defense.value)}</div>
+						<div class="text-xs text-faint">#{r.defense_rank}</div>
+					</td>
 					<td class="hidden max-w-56 truncate px-2 py-2.5 text-xs text-muted xl:table-cell">
 						{#if r.last_game}
 							{@const won = r.last_game.points_for > r.last_game.points_against}
@@ -186,6 +268,8 @@
 						</td>
 					</tr>
 				{/if}
+			{:else}
+				<tr><td colspan="10" class="px-3 py-6 text-center text-muted">No teams match “{query.trim()}”.</td></tr>
 			{/each}
 		</tbody>
 	</table>

@@ -20,6 +20,16 @@ export default defineConfig({
 			}
 		})
 	],
+	// Mirrors worker.ts, which serves /logo/* in production; preview reuses it.
+	server: {
+		proxy: {
+			'/logo': {
+				target: 'https://cdn.collegefootballdata.com',
+				changeOrigin: true,
+				rewrite: (path) => path.replace(/^\/logo\//, '/logos/')
+			}
+		}
+	},
 	test: {
 		expect: { requireAssertions: true },
 		include: ['src/**/*.test.ts']

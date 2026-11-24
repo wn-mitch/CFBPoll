@@ -52,3 +52,21 @@ test('projected scores are never negative', async ({ page, request }) => {
 		expect(Math.min(p.home_points, p.away_points)).toBeGreaterThanOrEqual(0);
 	}
 });
+
+test('search, offense ranking and the share image', async ({ page }) => {
+	await page.goto('/');
+	const teams = page.locator('tbody a[href^="/team/"]');
+
+	await page.getByLabel('Search teams').fill('ohio st');
+	await expect(teams).toHaveText(['Ohio State']);
+	await page.getByLabel('Search teams').fill('');
+
+	await page.getByText('Offense', { exact: true }).click();
+	const rows: { team: string; offense_rank: number }[] = await (await page.request.get('/data/rankings.json')).json();
+	const best = rows.find((r) => r.offense_rank === 1)!;
+	await expect(teams.first()).toHaveText(best.team);
+
+	const download = page.waitForEvent('download');
+	await page.getByRole('button', { name: /Share top 25 offenses image/ }).click();
+	expect((await download).suggestedFilename()).toMatch(/^cfb-poll-offense-top-25-\d{4}\.png$/);
+});

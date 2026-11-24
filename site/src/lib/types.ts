@@ -45,6 +45,8 @@ export interface RankRow {
 	overall: Rated;
 	offense: Rated;
 	defense: Rated;
+	offense_rank: number;
+	defense_rank: number;
 	change: number;
 	last_game: GameRef | null;
 	schedule_strength: number;

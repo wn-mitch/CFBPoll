@@ -139,6 +139,10 @@ impl Built<'_> {
             });
         let odds = self.sim.teams[t].as_ref();
         let (sos, top25) = self.schedule_strength(t);
+        let unit_rank = |f: fn(&model::season::TeamRating) -> f64| {
+            let ratings = self.run.final_ratings();
+            1 + self.order.iter().filter(|&&x| f(&ratings[x]) > f(&r)).count()
+        };
         RankRow {
             rank: self.rank_of(t).unwrap_or(0),
             rank_low: odds.map_or(0, |o| o.rank_p05),
@@ -161,6 +165,8 @@ impl Built<'_> {
                 value: round1(r.defense - self.avg.2),
                 sd: round1(r.defense_sd),
             },
+            offense_rank: unit_rank(|x| x.offense),
+            defense_rank: unit_rank(|x| x.defense),
             change: round1(match (prev, prev_avg) {
                 (Some(p), Some(pa)) => (r.overall - self.avg.0) - (p - pa),
                 _ => 0.0,

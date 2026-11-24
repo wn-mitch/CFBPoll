@@ -58,6 +58,9 @@ pub struct RankRow {
     pub overall: Rated,
     pub offense: Rated,
     pub defense: Rated,
+    /// Rank of the offense and defense ratings among FBS teams.
+    pub offense_rank: usize,
+    pub defense_rank: usize,
     /// Overall change since the previous week's snapshot.
     pub change: f64,
     pub last_game: Option<GameRef>,
