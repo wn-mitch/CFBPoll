@@ -39,6 +39,8 @@ fn season(championship_played: bool) -> Season {
                 away: a,
                 score,
                 ppa: None,
+                efficiency: Vec::new(),
+                starters: (None, None),
                 market_margin: None,
                 market_total: None,
                 cfbd_elo: None,

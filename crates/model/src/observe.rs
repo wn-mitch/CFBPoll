@@ -1,8 +1,8 @@
 //! Turns a game into an observation, and a state into a game prediction.
 
 use crate::data::Game;
-use crate::kalman::{Gaussian, Observation, Row};
-use crate::layout::Layout;
+use crate::kalman::{invert_spd, Gaussian, Observation, Row};
+use crate::layout::{Layout, MU};
 use crate::params::Params;
 use serde::{Deserialize, Serialize};
 
@@ -25,10 +25,16 @@ pub fn home_shift(game: &Game, params: &Params) -> f64 {
     }
 }
 
-/// Observation for a completed game: both scores, plus each offense's PPA
-/// per play when available and enabled. The margin is soft-capped while the
-/// total is kept, so a blowout counts like a large-but-finite win. PPA is
-/// garbage-time-excluded at the source and is not capped.
+/// Observation for a completed game: both scores, plus each offense's
+/// readings when present and enabled. The margin is soft-capped while the
+/// total is kept, so a blowout counts like a large-but-finite win. Readings
+/// are not capped.
+///
+/// Every reading of one offense measures the same quantity, that offense
+/// minus the opposing defense, so the readings are first combined, weighted
+/// by their noise covariance, into one equivalent measurement per offense.
+/// The update is exactly the one the full set of readings gives, at the cost
+/// of a three-row observation however many readings there are.
 pub fn game_observation(
     layout: &Layout,
     params: &Params,
@@ -39,35 +45,85 @@ pub fn game_observation(
     let total = h + a;
     let margin = cap_margin(h - a, params.margin_cap);
     let shift = home_shift(game, params);
-    let mut rows = vec![
+    let score_rows = vec![
         layout.points(game.home, game.away),
         layout.points(game.away, game.home),
     ];
-    let mut offset = vec![shift, -shift];
-    let mut y = vec![(total + margin) / 2.0, (total - margin) / 2.0];
-    let ppa = game.ppa.filter(|_| params.use_efficiency);
-    if let Some((hp, ap)) = ppa {
-        let k = params.ppa_scale;
-        for (off, def, s, v) in [
-            (game.home, game.away, shift, hp),
-            (game.away, game.home, -shift, ap),
-        ] {
-            let mut r: Row = layout
-                .offense(off)
-                .into_iter()
-                .map(|(i, c)| (i, k * c))
-                .collect();
-            r.extend(layout.defense(def).into_iter().map(|(i, c)| (i, -k * c)));
-            rows.push(r);
-            offset.push(params.ppa_mean + k * s);
-            y.push(v);
+    let score_y = vec![
+        (total + margin) / 2.0 - shift,
+        (total - margin) / 2.0 + shift,
+    ];
+
+    let mut present: [Vec<(usize, f64)>; 2] = [Vec::new(), Vec::new()];
+    if params.use_efficiency {
+        for (j, r) in params.readings.iter().enumerate() {
+            if let Some((hv, av)) = game.reading(&r.name) {
+                present[0].push((j, hv));
+                present[1].push((j, av));
+            }
         }
     }
+    if present[0].is_empty() {
+        return Observation {
+            rows: score_rows,
+            offset: vec![0.0, 0.0],
+            y: score_y,
+            noise: params.game_noise(&[], &[]),
+        };
+    }
+
+    // Base combinations: μ, home offense − away defense, and the reverse.
+    let z = |off: usize, def: usize| -> Row {
+        let mut r = layout.offense(off);
+        r.extend(layout.defense(def).into_iter().map(|(i, c)| (i, -c)));
+        r
+    };
+    let base = vec![
+        vec![(MU, 1.0)],
+        z(game.home, game.away),
+        z(game.away, game.home),
+    ];
+    // Each observation as coefficients on `base`, with its value net of
+    // known offsets.
+    let mut b: Vec<[f64; 3]> = vec![[1.0, 1.0, 0.0], [1.0, 0.0, 1.0]];
+    let mut y = score_y;
+    for (side, s) in [(1, shift), (2, -shift)] {
+        for &(j, v) in &present[side - 1] {
+            let r = &params.readings[j];
+            let mut row = [0.0; 3];
+            row[side] = r.scale;
+            b.push(row);
+            y.push(v - r.mean - r.scale * s);
+        }
+    }
+    let idx = |side: usize| present[side].iter().map(|&(j, _)| j).collect::<Vec<_>>();
+    let noise = params.game_noise(&idx(0), &idx(1));
+    let k = y.len();
+    let r_inv = invert_spd(&noise, k).expect("reading noise is positive definite");
+    // W = Bᵀ R⁻¹ B and Bᵀ R⁻¹ y; the reduced observation is W⁻¹ Bᵀ R⁻¹ y
+    // with noise W⁻¹.
+    let mut w = vec![0.0; 9];
+    let mut bty = [0.0; 3];
+    for i in 0..k {
+        for j in 0..k {
+            let rij = r_inv[i * k + j];
+            for p in 0..3 {
+                bty[p] += b[i][p] * rij * y[j];
+                for q in 0..3 {
+                    w[p * 3 + q] += b[i][p] * rij * b[j][q];
+                }
+            }
+        }
+    }
+    let w_inv = invert_spd(&w, 3).expect("scores identify all three base combinations");
+    let y_hat: Vec<f64> = (0..3)
+        .map(|p| (0..3).map(|q| w_inv[p * 3 + q] * bty[q]).sum())
+        .collect();
     Observation {
-        rows,
-        offset,
-        y,
-        noise: params.game_noise(ppa.is_some()),
+        rows: base,
+        offset: vec![0.0; 3],
+        y: y_hat,
+        noise: w_inv,
     }
 }
 

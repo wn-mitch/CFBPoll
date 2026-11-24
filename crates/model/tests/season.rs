@@ -31,6 +31,8 @@ fn game(id: i64, week: i32, home: usize, away: usize, score: Option<(f64, f64)>)
         away,
         score,
         ppa: None,
+        efficiency: Vec::new(),
+        starters: (None, None),
         market_margin: None,
         market_total: None,
         cfbd_elo: None,
@@ -94,7 +96,7 @@ fn conference_levels_need_cross_conference_games() {
     };
     let params = Params::default();
     let run = run_season(&season, &params, &RunOptions::default());
-    let layout = Layout::new(&season);
+    let layout = Layout::new(&season, false);
     for c in 0..2 {
         // In-conference games say nothing about a conference's overall level
         // (co + cd), since both teams share it. Totals can still move its
@@ -302,10 +304,133 @@ fn efficiency_reading_tightens_ratings_more() {
 
 #[test]
 fn invalid_noise_is_rejected() {
-    let p = Params {
-        ppa_score_corr: 1.5,
-        ..Params::default()
-    };
+    let mut p = Params::default();
+    p.readings[0].score_corr = 1.5;
     assert!(!p.is_valid());
     assert!(Params::default().is_valid());
+}
+
+#[test]
+fn combined_readings_update_matches_full_update() {
+    // The filter folds an offense's readings into one measurement before
+    // updating; the posterior must equal the update on every reading.
+    use model::data::EFFICIENCY;
+    use model::kalman::{Gaussian, Observation, Row};
+    use model::layout::{initial_state, MU};
+    use model::params::Reading;
+
+    let teams = vec![
+        team("A", Class::Fbs, Some("X")),
+        team("B", Class::Fbs, Some("Y")),
+    ];
+    let mut g = game(1, 1, 0, 1, Some((31.0, 17.0)));
+    g.ppa = Some((0.30, -0.05));
+    let mut eff = vec![None; EFFICIENCY.len()];
+    eff[0] = Some((0.48, 0.36));
+    g.efficiency = eff;
+    let season = Season {
+        year: 2024,
+        teams,
+        games: vec![g.clone()],
+    };
+    let mut params = Params::default();
+    params.readings.push(Reading {
+        name: "success_rate".into(),
+        mean: 0.42,
+        scale: 0.006,
+        sd: 0.08,
+        score_corr: 0.4,
+    });
+    params.reading_corr = vec![1.0, 0.6, 0.6, 1.0];
+    params.reading_noise_scale = 1.2;
+    // Compare on raw scores; the soft margin cap is tested elsewhere.
+    params.margin_cap = f64::INFINITY;
+    assert!(params.is_valid());
+    let run = run_season(&season, &params, &RunOptions::default());
+
+    let layout = Layout::new(&season, false);
+    let mut full: Gaussian = initial_state(&season, &layout, &params, &[]);
+    let shift = params.hfa / 2.0;
+    let gap = |off: usize, def: usize| -> Row {
+        let mut r = layout.points(off, def);
+        r.retain(|&(i, _)| i != MU);
+        r
+    };
+    let scaled = |r: Row, k: f64| -> Row { r.into_iter().map(|(i, c)| (i, k * c)).collect() };
+    let (p, s) = (&params.readings[0], &params.readings[1]);
+    full.update(&Observation {
+        rows: vec![
+            layout.points(0, 1),
+            layout.points(1, 0),
+            scaled(gap(0, 1), p.scale),
+            scaled(gap(0, 1), s.scale),
+            scaled(gap(1, 0), p.scale),
+            scaled(gap(1, 0), s.scale),
+        ],
+        offset: vec![
+            shift,
+            -shift,
+            p.mean + p.scale * shift,
+            s.mean + s.scale * shift,
+            p.mean - p.scale * shift,
+            s.mean - s.scale * shift,
+        ],
+        y: vec![31.0, 17.0, 0.30, 0.48, -0.05, 0.36],
+        noise: params.game_noise(&[0, 1], &[0, 1]),
+    });
+    let diff = |a: &[f64], b: &[f64]| {
+        a.iter()
+            .zip(b)
+            .map(|(x, y)| (x - y).abs())
+            .fold(0.0, f64::max)
+    };
+    assert!(
+        diff(&full.mean, &run.state.mean) < 1e-9,
+        "means differ by {}",
+        diff(&full.mean, &run.state.mean)
+    );
+    assert!(diff(&full.cov, &run.state.cov) < 1e-9, "covariances differ");
+}
+
+#[test]
+fn backup_quarterback_moves_the_offense_by_his_prior() {
+    let teams = vec![team("A", Class::Fbs, None), team("B", Class::Fbs, None)];
+    let mut g1 = game(1, 1, 0, 1, Some((24.0, 21.0)));
+    g1.starters = (Some("starter".into()), Some("p".into()));
+    let with_backup = |second: &str| {
+        let mut g2 = game(2, 2, 0, 1, Some((20.0, 20.0)));
+        g2.starters = (Some(second.into()), Some("p".into()));
+        Season {
+            year: 2024,
+            teams: teams.clone(),
+            games: vec![g1.clone(), g2],
+        }
+    };
+    let params = Params {
+        qb_sd: 0.5,
+        qb_new_mean: -3.0,
+        ..Params::default()
+    };
+    let home_points = |s: &Season, p: &Params| {
+        run_season(s, p, &RunOptions::default()).predictions[1]
+            .1
+            .home_points
+    };
+    let same = home_points(&with_backup("starter"), &params);
+    let backup = home_points(&with_backup("backup"), &params);
+    // The backup has played no game yet, so his offense is his prior mean.
+    assert!(
+        (backup - same - -3.0).abs() < 1e-6,
+        "backup shifts by {}",
+        backup - same
+    );
+    // With quarterbacks off, the starter's identity changes nothing.
+    let off = Params {
+        qb_sd: 0.0,
+        ..params
+    };
+    assert_eq!(
+        home_points(&with_backup("backup"), &off),
+        home_points(&with_backup("starter"), &off)
+    );
 }

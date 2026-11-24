@@ -117,6 +117,8 @@ mod tests {
             away,
             score,
             ppa: None,
+            efficiency: Vec::new(),
+            starters: (None, None),
             market_margin: None,
             market_total: None,
             cfbd_elo: None,

@@ -35,11 +35,21 @@
 		what Elo approximates with one fixed step size.
 	</p>
 	<p>
-		A game provides four readings: each team's score, and each offense's efficiency (expected points added per play,
-		with garbage time removed). Efficiency strips out some luck that scores keep, such as fumble bounces and
-		pick-sixes. The fitting step decides how much weight each reading gets. Home field is worth
+		A game provides each team's score and, for each offense, a set of efficiency readings with garbage time removed:
+		expected points added per play, success rate, explosiveness, rushing and passing efficiency, passing-down success,
+		line yards, stuff rate and the havoc it allowed. Efficiency strips out some luck that scores keep, such as fumble
+		bounces and pick-sixes. Each reading's weight comes from how noisy it is and how much it overlaps the score and
+		the other readings. Home field is worth
 		{data.meta.hfa} points and is zero at neutral sites. Ratings drift a little each week, so a team can genuinely
 		improve or decline.
+	</p>
+
+	<h2>Quarterback changes</h2>
+	<p>
+		A team's rating includes its opening-day starter at quarterback. When someone else starts, the offense gets that
+		quarterback's own adjustment, which starts below the opener's level (backups average about
+		{Math.abs(data.meta.qb_new_mean).toFixed(1)} points worse) and is learned from the games he starts. When
+		the opener returns, so does the team's usual offense.
 	</p>
 
 	<h2>Conferences start equal</h2>
@@ -139,7 +149,8 @@
 
 	<h2>What it does not do</h2>
 	<p>
-		It does not know about injuries, quarterback changes or coaching changes until they show up in results. Conference
+		It does not know about injuries other than a change at quarterback, and it learns a new quarterback's level only
+		from the games he starts. Conference
 		tiebreakers in the simulation are simplified (record, then head-to-head, then rating). Data comes from
 		CollegeFootballData.com.
 	</p>

@@ -49,6 +49,10 @@ pub struct Features {
     pub portal: Option<[f64; 6]>,
     /// 247 team talent composite.
     pub talent: Option<f64>,
+    /// Whether the head coach changed since last season; `None` without
+    /// coach data (FCS teams).
+    #[serde(default)]
+    pub new_coach: Option<bool>,
 }
 
 /// Which feature blocks the design matrix includes.
@@ -58,6 +62,10 @@ pub struct Blocks {
     pub continuity: bool,
     pub portal: bool,
     pub talent: bool,
+    /// A coaching change, and its interaction with last season's rating
+    /// (a new coach may change how much of last season carries over).
+    #[serde(default)]
+    pub coaching: bool,
 }
 
 impl Blocks {
@@ -66,6 +74,7 @@ impl Blocks {
         continuity: true,
         portal: true,
         talent: true,
+        coaching: true,
     };
 }
 
@@ -110,6 +119,12 @@ fn raw(f: &Features, b: Blocks) -> Vec<Option<f64>> {
     }
     if b.talent {
         v.push(f.talent);
+    }
+    if b.coaching {
+        let n = f.new_coach.map(|n| if n { 1.0 } else { 0.0 });
+        v.push(n);
+        v.push(po.zip(n).map(|(o, n)| o * n));
+        v.push(pd.zip(n).map(|(d, n)| d * n));
     }
     v
 }

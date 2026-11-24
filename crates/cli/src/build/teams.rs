@@ -288,6 +288,7 @@ pub fn meta(b: &Built, uses_prior: bool) -> Meta {
         uses_prior,
         draws: b.sim.draws,
         hfa: round1(b.params.hfa),
+        qb_new_mean: round1(b.params.qb_new_mean),
     }
 }
 

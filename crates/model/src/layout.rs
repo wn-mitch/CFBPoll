@@ -4,23 +4,37 @@
 use crate::data::{Class, Season};
 use crate::kalman::{Gaussian, Row};
 use crate::params::{ClassPrior, Params};
+use std::collections::HashMap;
 
-/// State layout: `[μ, (o, d) per team, (co, cd) per conference]`.
+/// State layout: `[μ, (o, d) per team, (co, cd) per conference, q per
+/// quarterback]`.
 ///
 /// `o` is points scored above the league level; `d` is points prevented
 /// (higher is better). A team's effective offense is its conference's `co`
 /// plus its own `o`; independents and pseudo-teams have no conference term.
+///
+/// `o` includes the team's opening starter at quarterback. Every other
+/// quarterback who starts for the team gets a `q`, his offense relative to
+/// the opener, added to the team's offense while he is the current starter.
+/// A team that keeps one starter all season has no `q` at all.
 #[derive(Debug, Clone)]
 pub struct Layout {
     team_conf: Vec<Option<usize>>,
     pub conferences: Vec<String>,
     n_teams: usize,
+    /// State index of each `(team, athlete id)` non-opening starter.
+    qbs: HashMap<(usize, String), usize>,
+    /// Each team's opening starter.
+    openers: Vec<Option<String>>,
+    /// State index of each team's current starter; `None` for the opener.
+    current: Vec<Option<usize>>,
 }
 
 pub const MU: usize = 0;
 
 impl Layout {
-    pub fn new(season: &Season) -> Self {
+    /// Layout for `season`, with quarterback entries when `with_qbs`.
+    pub fn new(season: &Season, with_qbs: bool) -> Self {
         let conferences = season.conferences();
         let team_conf = season
             .teams
@@ -33,15 +47,58 @@ impl Layout {
                 conferences.iter().position(|x| x == c)
             })
             .collect();
+        let n_teams = season.teams.len();
+        let base = 1 + 2 * n_teams + 2 * conferences.len();
+        let mut openers: Vec<Option<String>> = vec![None; n_teams];
+        let mut qbs = HashMap::new();
+        if with_qbs {
+            for g in &season.games {
+                for (t, id) in [(g.home, &g.starters.0), (g.away, &g.starters.1)] {
+                    let Some(id) = id else { continue };
+                    if !season.teams[t].class.is_rated() {
+                        continue;
+                    }
+                    match &openers[t] {
+                        None => openers[t] = Some(id.clone()),
+                        Some(o) if o == id => {}
+                        Some(_) => {
+                            let next = base + qbs.len();
+                            qbs.entry((t, id.clone())).or_insert(next);
+                        }
+                    }
+                }
+            }
+        }
         Self {
             team_conf,
             conferences,
-            n_teams: season.teams.len(),
+            n_teams,
+            qbs,
+            openers,
+            current: vec![None; n_teams],
         }
     }
 
     pub fn dim(&self) -> usize {
-        1 + 2 * self.n_teams + 2 * self.conferences.len()
+        1 + 2 * self.n_teams + 2 * self.conferences.len() + self.qbs.len()
+    }
+
+    /// State indices of every quarterback entry.
+    pub fn qb_entries(&self) -> impl Iterator<Item = usize> + '_ {
+        self.qbs.values().copied()
+    }
+
+    /// Makes each side's starter in `game`, when known, its team's current
+    /// starter. Later offense rows, including for future games, use them.
+    pub fn set_starters(&mut self, game: &crate::data::Game) {
+        for (t, id) in [(game.home, &game.starters.0), (game.away, &game.starters.1)] {
+            let Some(id) = id else { continue };
+            if self.openers[t].as_ref() == Some(id) {
+                self.current[t] = None;
+            } else if let Some(&i) = self.qbs.get(&(t, id.clone())) {
+                self.current[t] = Some(i);
+            }
+        }
     }
 
     pub fn team_o(&self, t: usize) -> usize {
@@ -69,6 +126,9 @@ impl Layout {
         let mut r = vec![(self.team_o(t), 1.0)];
         if let Some(c) = self.team_conf[t] {
             r.push((self.conf_o(c), 1.0));
+        }
+        if let Some(q) = self.current[t] {
+            r.push((q, 1.0));
         }
         r
     }
@@ -161,6 +221,10 @@ pub fn initial_state(
     for c in 0..layout.conferences.len() {
         var[layout.conf_o(c)] = params.conf_sd.powi(2);
         var[layout.conf_d(c)] = params.conf_sd.powi(2);
+    }
+    for i in layout.qb_entries() {
+        mean[i] = params.qb_new_mean;
+        var[i] = params.qb_sd.powi(2);
     }
     Gaussian::diagonal(mean, &var)
 }

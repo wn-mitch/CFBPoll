@@ -72,11 +72,47 @@ pub struct Game {
     /// Garbage-time-excluded offensive PPA per play, `(home, away)`, when
     /// both sides are available.
     pub ppa: Option<(f64, f64)>,
+    /// Other per-game offensive readings, `(home, away)`, indexed like
+    /// `EFFICIENCY`; `None` where either side is missing. Empty when the
+    /// season has no advanced stats.
+    #[serde(default)]
+    pub efficiency: Vec<Option<(f64, f64)>>,
+    /// Athlete id of each side's starting quarterback (most pass attempts),
+    /// `(home, away)`, when the box score has one.
+    #[serde(default)]
+    pub starters: (Option<String>, Option<String>),
     /// Closing spread as predicted home margin (positive favors home).
     pub market_margin: Option<f64>,
     pub market_total: Option<f64>,
     /// CFBD's pregame Elo, `(home, away)`, used as a baseline.
     pub cfbd_elo: Option<(f64, f64)>,
+}
+
+/// Names of the readings in `Game::efficiency`, all from the offense's side:
+/// garbage-time-excluded success rate, explosiveness (PPA on successful
+/// plays), rushing and passing PPA, passing-down success rate, line yards per
+/// carry, stuff rate, and the havoc rate the offense allowed.
+pub const EFFICIENCY: [&str; 8] = [
+    "success_rate",
+    "explosiveness",
+    "rush_ppa",
+    "pass_ppa",
+    "passing_downs_success",
+    "line_yards",
+    "stuff_rate",
+    "havoc",
+];
+
+impl Game {
+    /// `(home, away)` value of the named offensive reading: `"ppa"` or one of
+    /// `EFFICIENCY`.
+    pub fn reading(&self, name: &str) -> Option<(f64, f64)> {
+        if name == "ppa" {
+            return self.ppa;
+        }
+        let i = EFFICIENCY.iter().position(|&n| n == name)?;
+        self.efficiency.get(i).copied().flatten()
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

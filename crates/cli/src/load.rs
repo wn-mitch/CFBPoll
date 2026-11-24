@@ -1,8 +1,11 @@
 //! Converts cached CFBD data into the model's `Season`.
 
 use anyhow::Result;
-use cfbd::{BettingGame, Cache, Dataset, TeamGamePpa};
-use model::data::{iso_day, Class, Game, Season, Team, Week};
+use cfbd::{
+    BettingGame, Cache, Dataset, GamePlayers, TeamGameAdvanced, TeamGameHavoc, TeamGamePpa,
+    WeeklyDataset,
+};
+use model::data::{iso_day, Class, Game, Season, Team, Week, EFFICIENCY};
 use std::collections::{BTreeMap, HashMap};
 
 /// Conference labels that mean "no conference".
@@ -106,6 +109,8 @@ pub fn load_season(cache: &Cache, year: i32) -> Result<Season> {
 
     let ppa = ppa_by_game(cache, year)?;
     let lines = market_by_game(&cache.load::<BettingGame>(year, Dataset::Lines)?);
+    let efficiency = efficiency_by_game(cache, year)?;
+    let starters = starters_by_game(cache, year)?;
 
     let mut games: Vec<Game> = Vec::new();
     for g in &raw {
@@ -138,6 +143,18 @@ pub fn load_season(cache: &Cache, year: i32) -> Result<Season> {
             away,
             score,
             ppa,
+            efficiency: efficiency
+                .get(&g.id)
+                .map(|m| {
+                    let (h, a) = (m.get(&g.home_team), m.get(&g.away_team));
+                    (0..EFFICIENCY.len())
+                        .map(|i| Some((h?[i]?, a?[i]?)))
+                        .collect()
+                })
+                .unwrap_or_default(),
+            starters: starters.get(&g.id).map_or((None, None), |m| {
+                (m.get(&g.home_team).cloned(), m.get(&g.away_team).cloned())
+            }),
             market_margin,
             market_total,
             cfbd_elo: g
@@ -148,6 +165,62 @@ pub fn load_season(cache: &Cache, year: i32) -> Result<Season> {
     }
     games.sort_by_key(|g| (g.week, g.day, g.id));
     Ok(Season { year, teams, games })
+}
+
+type Readings = [Option<f64>; EFFICIENCY.len()];
+
+/// `EFFICIENCY` readings by game and offense. Rates over fewer than 10
+/// plays of their kind are dropped as too noisy.
+fn efficiency_by_game(cache: &Cache, year: i32) -> Result<HashMap<i64, HashMap<String, Readings>>> {
+    let mut out: HashMap<i64, HashMap<String, Readings>> = HashMap::new();
+    for r in cache
+        .load_optional::<TeamGameAdvanced>(year, Dataset::Advanced)?
+        .unwrap_or_default()
+    {
+        let o = &r.offense;
+        if o.plays.is_none_or(|n| n < 10.0) {
+            continue;
+        }
+        let mut v: Readings = [None; EFFICIENCY.len()];
+        v[0] = o.success_rate;
+        v[1] = o.explosiveness;
+        v[2] = o.rushing_plays.ppa;
+        v[3] = o.passing_plays.ppa;
+        v[4] = o.passing_downs.success_rate;
+        v[5] = o.line_yards;
+        v[6] = o.stuff_rate;
+        out.entry(r.game_id).or_default().insert(r.team, v);
+    }
+    for r in cache
+        .load_optional::<TeamGameHavoc>(year, Dataset::Havoc)?
+        .unwrap_or_default()
+    {
+        if r.offense.total_plays.is_none_or(|n| n < 10.0) {
+            continue;
+        }
+        out.entry(r.game_id)
+            .or_default()
+            .entry(r.team)
+            .or_insert([None; EFFICIENCY.len()])[7] = r.offense.havoc_rate;
+    }
+    Ok(out)
+}
+
+/// Starting quarterback (most pass attempts) by game and team.
+fn starters_by_game(cache: &Cache, year: i32) -> Result<HashMap<i64, HashMap<String, String>>> {
+    let mut out: HashMap<i64, HashMap<String, String>> = HashMap::new();
+    for ds in WeeklyDataset::ALL {
+        for g in cache
+            .load_weekly::<GamePlayers>(year, ds)?
+            .unwrap_or_default()
+        {
+            let m = out.entry(g.id).or_default();
+            for (team, id) in g.starting_passers() {
+                m.entry(team).or_insert(id);
+            }
+        }
+    }
+    Ok(out)
 }
 
 /// Offensive PPA per play by game and team.

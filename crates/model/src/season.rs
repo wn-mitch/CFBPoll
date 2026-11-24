@@ -75,17 +75,17 @@ pub struct RunOptions<'a> {
 }
 
 pub fn run_season(season: &Season, params: &Params, opts: &RunOptions) -> SeasonRun {
-    let layout = Layout::new(season);
+    let mut layout = Layout::new(season, params.qb_sd > 0.0);
     let mut state = initial_state(season, &layout, params, opts.priors);
     let drift = drift_variances(season, &layout, params);
-    let snapshot = |state: &Gaussian, week: Option<Week>| Snapshot {
+    let snapshot = |state: &Gaussian, layout: &Layout, week: Option<Week>| Snapshot {
         week,
         ratings: (0..season.teams.len())
-            .map(|t| rating(state, &layout, t))
+            .map(|t| rating(state, layout, t))
             .collect(),
     };
 
-    let mut snapshots = vec![snapshot(&state, None)];
+    let mut snapshots = vec![snapshot(&state, &layout, None)];
     let mut predictions = Vec::new();
     let mut last_day: Option<i64> = None;
     let mut current_week: Option<Week> = None;
@@ -97,7 +97,7 @@ pub fn run_season(season: &Season, params: &Params, opts: &RunOptions) -> Season
         let Some(score) = game.score else { continue };
 
         if current_week.is_some_and(|w| w != game.week) {
-            snapshots.push(snapshot(&state, current_week));
+            snapshots.push(snapshot(&state, &layout, current_week));
         }
         current_week = Some(game.week);
 
@@ -120,11 +120,14 @@ pub fn run_season(season: &Season, params: &Params, opts: &RunOptions) -> Season
             }
         }
 
+        // The box score's starter is known by kickoff, as it is to the
+        // closing line.
+        layout.set_starters(game);
         predictions.push((gi, predict(&state, &layout, params, game)));
         state.update(&game_observation(&layout, params, game, score));
     }
     if current_week.is_some() {
-        snapshots.push(snapshot(&state, current_week));
+        snapshots.push(snapshot(&state, &layout, current_week));
     }
 
     SeasonRun {

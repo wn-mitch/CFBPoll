@@ -9,6 +9,7 @@ export interface Meta {
 	uses_prior: boolean;
 	draws: number;
 	hfa: number;
+	qb_new_mean: number;
 }
 
 export interface Rated {

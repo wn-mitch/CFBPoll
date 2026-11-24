@@ -16,6 +16,9 @@ pub struct Meta {
     pub uses_prior: bool,
     pub draws: usize,
     pub hfa: f64,
+    /// Prior offense of a non-opening starting quarterback relative to the
+    /// opener, in points.
+    pub qb_new_mean: f64,
 }
 
 #[derive(Debug, Serialize)]

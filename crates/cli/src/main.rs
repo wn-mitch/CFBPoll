@@ -9,6 +9,7 @@ mod load;
 mod odds;
 mod prior;
 mod rank;
+mod readings;
 mod season;
 
 use anyhow::Result;
@@ -64,13 +65,32 @@ enum Cmd {
         /// Roster-churn prior model (JSON); fits with priors when given.
         #[arg(long)]
         prior: Option<PathBuf>,
-        /// Fit without efficiency (PPA) observations.
+        /// Fit without the offensive readings.
         #[arg(long)]
         score_only: bool,
         #[arg(long, default_value = "params.json")]
         out: PathBuf,
         #[arg(long, default_value_t = 1500)]
         max_evals: usize,
+        /// Fit only these knobs (comma-separated), holding the rest fixed.
+        #[arg(long, value_delimiter = ',')]
+        only: Vec<String>,
+    },
+    /// Estimate the offensive readings' observation model into a params file.
+    Readings {
+        #[arg(long, value_parser = season::parse_years)]
+        years: season::Years,
+        #[arg(long)]
+        params: Option<PathBuf>,
+        /// Roster-churn prior model (JSON) for the score-only runs.
+        #[arg(long)]
+        prior: Option<PathBuf>,
+        /// Readings to use (comma-separated); defaults to ppa and every
+        /// efficiency reading.
+        #[arg(long, value_delimiter = ',')]
+        names: Vec<String>,
+        #[arg(long)]
+        out: PathBuf,
     },
     /// Fit the roster-churn season prior and report ablations.
     Prior {
@@ -169,12 +189,31 @@ fn main() -> Result<()> {
             score_only,
             out,
             max_evals,
+            only,
         } => {
             let mut params = load_params(params.as_deref())?;
             if score_only {
                 params.use_efficiency = false;
             }
-            fit::run(&cache, &years.0, &params, prior.as_deref(), &out, max_evals)
+            fit::run(
+                &cache,
+                &years.0,
+                &params,
+                prior.as_deref(),
+                &out,
+                max_evals,
+                &only,
+            )
+        }
+        Cmd::Readings {
+            years,
+            params,
+            prior,
+            names,
+            out,
+        } => {
+            let params = load_params(params.as_deref())?;
+            readings::run(&cache, &years.0, &params, prior.as_deref(), &names, &out)
         }
         Cmd::Prior {
             years,

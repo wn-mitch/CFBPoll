@@ -1,6 +1,6 @@
-# Training seasons for fitting; the two most recent complete seasons are held out.
+# Training seasons for fitting; 2024 onward is held out.
 train := "2010-2023"
-holdout := "2024-2025"
+holdout := "2024-2026"
 cli := "cargo run --release --quiet -p cfbpoll --"
 
 default:
@@ -17,6 +17,11 @@ fetch-all:
 # Fit hyperparameters (slow). Writes artifacts/params.json.
 fit:
     {{cli}} fit --years {{train}} --params artifacts/params.json --prior artifacts/prior.json --out artifacts/params.json
+
+# Estimate the offensive readings' observation model into artifacts/params.json
+# (run before `fit`, which then tunes reading_noise_scale).
+readings:
+    {{cli}} readings --years {{train}} --params artifacts/params.json --prior artifacts/prior.json --out artifacts/params.json
 
 # Refit the roster-churn prior. Writes artifacts/prior.json.
 prior:

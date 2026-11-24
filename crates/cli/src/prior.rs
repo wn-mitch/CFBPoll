@@ -93,6 +93,7 @@ const NONE: Blocks = Blocks {
     continuity: false,
     portal: false,
     talent: false,
+    coaching: false,
 };
 
 pub fn run(
@@ -154,6 +155,14 @@ pub fn run(
             },
         ),
         (
+            "+ returning + coaching change",
+            Blocks {
+                returning: true,
+                coaching: true,
+                ..NONE
+            },
+        ),
+        (
             "+ returning + continuity",
             Blocks {
                 returning: true,
@@ -165,10 +174,18 @@ pub fn run(
             "+ returning + continuity + portal",
             Blocks {
                 talent: false,
+                coaching: false,
                 ..Blocks::ALL
             },
         ),
-        ("all, including talent", Blocks::ALL),
+        (
+            "+ talent",
+            Blocks {
+                coaching: false,
+                ..Blocks::ALL
+            },
+        ),
+        ("all, including coaching change", Blocks::ALL),
     ];
     let mut results = Vec::new();
     for (name, blocks) in variants {

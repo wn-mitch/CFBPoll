@@ -50,10 +50,9 @@ pub fn knobs() -> Vec<Knob> {
         knob!("team_drift_sd", team_drift_sd, true),
         knob!("conf_drift_sd", conf_drift_sd, true),
         knob!("mu_drift_sd", mu_drift_sd, true),
-        knob!("ppa_mean", ppa_mean, false),
-        knob!("ppa_scale", ppa_scale, true),
-        knob!("ppa_sd", ppa_sd, true),
-        knob!("ppa_score_corr", ppa_score_corr, false),
+        knob!("reading_noise_scale", reading_noise_scale, true),
+        knob!("qb_sd", qb_sd, true),
+        knob!("qb_new_mean", qb_new_mean, false),
         knob!("prior_sd_scale", prior_sd_scale, true),
     ]
 }
@@ -237,7 +236,11 @@ mod tests {
     #[test]
     fn vector_round_trip() {
         let k = knobs();
-        let p = Params::default();
+        // Positive knobs are searched on a log scale, so start them above zero.
+        let p = Params {
+            qb_sd: 2.0,
+            ..Params::default()
+        };
         let back = from_vector(&k, &p, &to_vector(&k, &p));
         for knob in &k {
             assert!(

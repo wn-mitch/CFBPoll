@@ -8,17 +8,21 @@ the uncertainty shown. Live at <https://cfb.alpacasoft.dev>.
 
 - **Ratings.** Each FBS and FCS team has an offense and a defense rating, in
   points. A Kalman filter updates them after every game from both scores and
-  each offense's garbage-time-excluded efficiency (PPA per play). Conference
-  levels start equal each season and move only on cross-conference games.
-- **Season start.** Last season's rating, adjusted for returning production,
-  roster continuity and transfer-portal flow by position group, fit by ridge
+  each offense's garbage-time-excluded efficiency: PPA, success rate,
+  explosiveness, rushing and passing PPA, passing-down success, line yards,
+  stuff rate and havoc allowed. A team's offense shifts when a quarterback
+  other than its opening starter starts. Conference levels start equal each
+  season and move only on cross-conference games.
+- **Season start.** Last season's rating and its conference's, adjusted for
+  returning production, coaching changes, roster continuity and
+  transfer-portal flow by position group, fit by ridge
   regression (`artifacts/prior.json`).
 - **Odds.** Monte Carlo simulation of the remaining schedule, conference
   title games and the 12-team playoff.
 - **Poll audit.** Compares the AP, Coaches and committee rankings with the
   model using only games played before each release.
 
-Hyperparameters are fit on 2010–2023 and evaluated on 2024–2025
+Hyperparameters are fit on 2010–2023 and evaluated on 2024–2026
 (`artifacts/accuracy.json`). The method page on the site has the details.
 
 ## Usage
@@ -37,6 +41,7 @@ Model maintenance (slow; outputs are committed under `artifacts/`):
 
 ```sh
 just prior          # refit the roster-churn prior
+just readings       # re-estimate the efficiency readings' noise model
 just fit            # refit hyperparameters
 just backtest       # held-out accuracy
 just audit          # human-poll comparison

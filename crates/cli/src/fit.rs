@@ -10,14 +10,17 @@ use model::layout::TeamPrior;
 use model::params::Params;
 use std::path::Path;
 
-/// Knobs that affect the objective under these settings: efficiency
-/// parameters only when efficiency is used, the prior sd scale only when
-/// priors are supplied.
-fn active_knobs(params: &Params, with_priors: bool) -> Vec<Knob> {
+/// Knobs that affect the objective under these settings: the reading noise
+/// scale only when readings are used, the prior sd scale only when priors
+/// are supplied, quarterback knobs only when `qb_sd` starts above zero.
+/// `only`, when non-empty, restricts the search to the named knobs.
+fn active_knobs(params: &Params, with_priors: bool, only: &[String]) -> Vec<Knob> {
     knobs()
         .into_iter()
-        .filter(|k| params.use_efficiency || !k.name.starts_with("ppa_"))
+        .filter(|k| params.use_efficiency || k.name != "reading_noise_scale")
         .filter(|k| with_priors || k.name != "prior_sd_scale")
+        .filter(|k| params.qb_sd > 0.0 || !k.name.starts_with("qb_"))
+        .filter(|k| only.is_empty() || only.iter().any(|n| n == k.name))
         .collect()
 }
 
@@ -28,6 +31,7 @@ pub fn run(
     prior: Option<&Path>,
     out: &Path,
     max_evals: usize,
+    only: &[String],
 ) -> Result<()> {
     let seasons: Vec<Season> = years
         .iter()
@@ -43,13 +47,15 @@ pub fn run(
             loso_priors(&data, &template, years)
         }
     };
-    let knobs = active_knobs(start, prior.is_some());
+    let knobs = active_knobs(start, prior.is_some(), only);
+    if knobs.is_empty() {
+        anyhow::bail!("no knobs to fit");
+    }
     let x0 = to_vector(&knobs, start);
     let step: Vec<f64> = knobs
         .iter()
         .map(|k| match k.name {
-            "ppa_mean" => 0.05,
-            "score_corr" | "ppa_score_corr" => 0.2,
+            "score_corr" => 0.2,
             _ if k.positive => 0.3,
             _ => 2.0,
         })

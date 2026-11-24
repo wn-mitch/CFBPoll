@@ -2,7 +2,7 @@
 //! CFBD data and fresh-start season runs.
 
 use anyhow::Result;
-use cfbd::{Cache, Dataset, PlayerTransfer, ReturningProduction, RosterPlayer, TeamTalent};
+use cfbd::{Cache, Coach, Dataset, PlayerTransfer, ReturningProduction, RosterPlayer, TeamTalent};
 use model::data::{Class, Season};
 use model::params::Params;
 use model::prior::{position_group, Example, Features};
@@ -80,6 +80,33 @@ pub struct Offseason {
     continuity: HashMap<String, [f64; 6]>,
     portal: Option<HashMap<String, [f64; 6]>>,
     talent: HashMap<String, f64>,
+    /// Schools whose head coach differs from last season's, and schools
+    /// whose coach is the same; schools in neither have no coach data.
+    new_coach: HashMap<String, bool>,
+}
+
+/// Head coach of each school in `year`: the coach with the most games
+/// there that season, or, before any game, the latest hire.
+fn head_coaches(rows: &[Coach], year: i32) -> HashMap<String, String> {
+    let mut best: HashMap<String, ((i32, String), String)> = HashMap::new();
+    for c in rows {
+        let name = format!("{} {}", c.first_name, c.last_name);
+        for s in c.seasons.iter().filter(|s| s.year == year) {
+            let key = (
+                s.games.unwrap_or(0),
+                c.hire_date.clone().unwrap_or_default(),
+            );
+            let e = best
+                .entry(s.school.clone())
+                .or_insert((key.clone(), name.clone()));
+            if key > e.0 {
+                *e = (key, name.clone());
+            }
+        }
+    }
+    best.into_iter()
+        .map(|(school, (_, name))| (school, name))
+        .collect()
 }
 
 impl Offseason {
@@ -108,11 +135,24 @@ impl Offseason {
             .load_optional::<PlayerTransfer>(year, Dataset::Portal)?
             .filter(|rows| !rows.is_empty())
             .map(|rows| portal_flow(&rows));
+        let coaches = |y: i32| -> Result<Option<HashMap<String, String>>> {
+            Ok(cache
+                .load_optional::<Coach>(y, Dataset::Coaches)?
+                .map(|rows| head_coaches(&rows, y)))
+        };
+        let new_coach = match (coaches(year - 1)?, coaches(year)?) {
+            (Some(prev), Some(now)) => now
+                .iter()
+                .filter_map(|(school, c)| Some((school.clone(), prev.get(school)? != c)))
+                .collect(),
+            _ => HashMap::new(),
+        };
         Ok(Offseason {
             returning,
             continuity,
             portal,
             talent,
+            new_coach,
         })
     }
 
@@ -138,6 +178,7 @@ impl Offseason {
                 .as_ref()
                 .map(|p| p.get(team).copied().unwrap_or([0.0; 6])),
             talent: self.talent.get(team).copied(),
+            new_coach: self.new_coach.get(team).copied(),
         }
     }
 }
