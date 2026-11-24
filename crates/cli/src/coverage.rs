@@ -2,13 +2,14 @@
 //! model inputs exist for which years.
 
 use anyhow::Result;
-use cfbd::{Cache, Dataset};
+use cfbd::{Cache, Dataset, WeeklyDataset};
 use serde::de::DeserializeOwned;
 
 pub fn run(cache: &Cache, years: &[i32]) -> Result<()> {
     let names: Vec<_> = Dataset::ALL
         .iter()
         .map(|d| d.file_name().trim_end_matches(".json"))
+        .chain(WeeklyDataset::ALL.iter().map(|d| d.dir()))
         .collect();
     println!(
         "year  {}",
@@ -21,6 +22,12 @@ pub fn run(cache: &Cache, years: &[i32]) -> Result<()> {
                 None => "-".to_string(),
                 Some(n) => n.to_string(),
             };
+            row.push_str(&format!("{cell:>11}"));
+        }
+        for ds in WeeklyDataset::ALL {
+            let cell = cache
+                .load_weekly::<cfbd::GamePlayers>(year, ds)?
+                .map_or("-".to_string(), |v| v.len().to_string());
             row.push_str(&format!("{cell:>11}"));
         }
         println!("{row}");
@@ -44,5 +51,8 @@ fn typed_rows(cache: &Cache, year: i32, ds: Dataset) -> Result<Option<usize>> {
         Dataset::Roster => n::<cfbd::RosterPlayer>(cache, year, ds),
         Dataset::Talent => n::<cfbd::TeamTalent>(cache, year, ds),
         Dataset::Calendar => n::<cfbd::CalendarWeek>(cache, year, ds),
+        Dataset::Advanced => n::<cfbd::TeamGameAdvanced>(cache, year, ds),
+        Dataset::Havoc => n::<cfbd::TeamGameHavoc>(cache, year, ds),
+        Dataset::Coaches => n::<cfbd::Coach>(cache, year, ds),
     }
 }

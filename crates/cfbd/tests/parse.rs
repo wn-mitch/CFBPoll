@@ -35,4 +35,20 @@ fn other_datasets() {
     parse::<RosterPlayer>("roster");
     parse::<TeamTalent>("talent");
     parse::<CalendarWeek>("calendar");
+    parse::<TeamGameAdvanced>("advanced");
+    parse::<TeamGameHavoc>("havoc");
+    let coaches: Vec<Coach> = parse("coaches");
+    assert!(!coaches[0].seasons.is_empty());
+}
+
+#[test]
+fn starting_passer_is_the_most_attempts() {
+    let games: Vec<GamePlayers> = parse("players_passing");
+    let starters: Vec<(String, String)> = games.iter().flat_map(|g| g.starting_passers()).collect();
+    let of = |team: &str| starters.iter().find(|s| s.0 == team).map(|s| s.1.as_str());
+    assert_eq!(of("Wagner"), Some("5095499"));
+    // 9/12 and 7/12: tied on attempts, so more completions wins.
+    assert_eq!(of("Florida Atlantic"), Some("4700135"));
+    // The team-total row (negative id) is never a starter.
+    assert_eq!(of("Eastern Illinois"), Some("4571721"));
 }

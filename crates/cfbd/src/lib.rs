@@ -6,7 +6,7 @@
 mod endpoint;
 mod types;
 
-pub use endpoint::Dataset;
+pub use endpoint::{Dataset, WeeklyDataset};
 pub use types::*;
 
 use anyhow::{bail, Context, Result};
@@ -87,6 +87,98 @@ impl Cache {
     pub fn root(&self) -> &Path {
         &self.root
     }
+
+    pub fn weekly_path(
+        &self,
+        year: i32,
+        ds: WeeklyDataset,
+        season_type: &str,
+        week: i32,
+    ) -> PathBuf {
+        self.root
+            .join(year.to_string())
+            .join(ds.dir())
+            .join(format!("{season_type}-{week:02}.json"))
+    }
+
+    fn store_weekly(
+        &self,
+        year: i32,
+        ds: WeeklyDataset,
+        season_type: &str,
+        week: i32,
+        body: &str,
+    ) -> Result<()> {
+        let path = self.weekly_path(year, ds, season_type, week);
+        let dir = path.parent().expect("cache path has a parent");
+        fs::create_dir_all(dir).with_context(|| format!("creating {}", dir.display()))?;
+        let tmp = path.with_extension("json.tmp");
+        fs::write(&tmp, body).with_context(|| format!("writing {}", tmp.display()))?;
+        fs::rename(&tmp, &path).with_context(|| format!("renaming to {}", path.display()))?;
+        Ok(())
+    }
+
+    /// Rows of every cached week of a weekly dataset, in file-name order, or
+    /// `None` when no week is cached.
+    pub fn load_weekly<T: DeserializeOwned>(
+        &self,
+        year: i32,
+        ds: WeeklyDataset,
+    ) -> Result<Option<Vec<T>>> {
+        let dir = self.root.join(year.to_string()).join(ds.dir());
+        let Ok(entries) = fs::read_dir(&dir) else {
+            return Ok(None);
+        };
+        let mut paths: Vec<PathBuf> = entries
+            .filter_map(|e| e.ok().map(|e| e.path()))
+            .filter(|p| p.extension().is_some_and(|x| x == "json"))
+            .collect();
+        paths.sort();
+        let mut rows = Vec::new();
+        for p in paths {
+            let text =
+                fs::read_to_string(&p).with_context(|| format!("reading {}", p.display()))?;
+            let mut v: Vec<T> =
+                serde_json::from_str(&text).with_context(|| format!("parsing {}", p.display()))?;
+            rows.append(&mut v);
+        }
+        Ok(Some(rows))
+    }
+}
+
+/// Seconds since the Unix epoch of an ISO-8601 UTC timestamp such as
+/// `2025-09-02T06:59:00.000Z`.
+fn iso_seconds(s: &str) -> Option<i64> {
+    let num = |a: usize, b: usize| -> Option<i64> { s.get(a..b)?.parse().ok() };
+    let (y, m, d) = (num(0, 4)?, num(5, 7)?, num(8, 10)?);
+    let (hh, mm, ss) = (num(11, 13)?, num(14, 16)?, num(17, 19)?);
+    let y = if m <= 2 { y - 1 } else { y };
+    let era = y.div_euclid(400);
+    let yoe = y.rem_euclid(400);
+    let doy = (153 * ((m + 9) % 12) + 2) / 5 + d - 1;
+    let days = era * 146_097 + yoe * 365 + yoe / 4 - yoe / 100 + doy - 719_468;
+    Some(days * 86_400 + hh * 3600 + mm * 60 + ss)
+}
+
+/// Whether a cached week must be fetched: always when absent; otherwise when
+/// it was fetched before the week's last game could be final (a day after
+/// its last kickoff), unless `refresh` only fills gaps. Weeks with no game
+/// started yet are never fetched.
+fn week_needs_fetch(
+    refresh: Refresh,
+    now: i64,
+    first_kickoff: Option<i64>,
+    final_after: Option<i64>,
+    fetched_at: Option<i64>,
+) -> bool {
+    if first_kickoff.is_some_and(|t| t > now) {
+        return false;
+    }
+    match (refresh, fetched_at) {
+        (_, None) | (Refresh::All, _) => true,
+        (Refresh::Missing, Some(_)) => false,
+        (Refresh::OlderThan(_), Some(at)) => final_after.is_none_or(|f| at < f),
+    }
 }
 
 /// When a cached file must be refetched.
@@ -144,17 +236,28 @@ impl Client {
 
     fn get(&self, path: &str, query: &[(&str, String)]) -> Result<String> {
         let url = format!("{}{}", self.base, path);
-        let mut req = self
-            .agent
-            .get(&url)
-            .header("Authorization", &format!("Bearer {}", self.key))
-            .header("Accept", "application/json");
-        for (k, v) in query {
-            req = req.query(*k, v);
-        }
-        let mut resp = req
-            .call()
-            .with_context(|| format!("GET {path} {query:?}"))?;
+        let send = || {
+            let mut req = self
+                .agent
+                .get(&url)
+                .header("Authorization", &format!("Bearer {}", self.key))
+                .header("Accept", "application/json");
+            for (k, v) in query {
+                req = req.query(*k, v);
+            }
+            req.call()
+        };
+        // CFBD rate-limits bursts with 429; back off and retry a few times.
+        let mut wait = Duration::from_secs(5);
+        let mut resp = loop {
+            match send() {
+                Err(ureq::Error::StatusCode(429)) if wait <= Duration::from_secs(40) => {
+                    std::thread::sleep(wait);
+                    wait *= 2;
+                }
+                r => break r.with_context(|| format!("GET {path} {query:?}"))?,
+            }
+        };
         resp.body_mut()
             .with_config()
             .limit(MAX_BODY_BYTES)
@@ -204,6 +307,64 @@ impl Client {
         Ok(fetched)
     }
 
+    /// Fetches the weeks of a weekly dataset that `week_needs_fetch` selects,
+    /// using the season's cached calendar. Returns the number of API calls.
+    pub fn sync_weekly(
+        &self,
+        cache: &Cache,
+        year: i32,
+        ds: WeeklyDataset,
+        refresh: Refresh,
+    ) -> Result<usize> {
+        let weeks: Vec<CalendarWeek> = cache.load(year, Dataset::Calendar)?;
+        let unix = |t: SystemTime| {
+            t.duration_since(SystemTime::UNIX_EPOCH)
+                .map_or(0, |d| d.as_secs() as i64)
+        };
+        let now = unix(SystemTime::now());
+        let mut calls = 0;
+        // The model uses only regular-season and postseason games (2020 also
+        // lists FCS spring weeks).
+        for w in weeks
+            .iter()
+            .filter(|w| w.season_type == "regular" || w.season_type == "postseason")
+        {
+            let first = w
+                .first_game_start
+                .as_deref()
+                .or(Some(&w.start_date))
+                .and_then(iso_seconds);
+            let last = w
+                .last_game_start
+                .as_deref()
+                .or(Some(&w.end_date))
+                .and_then(iso_seconds);
+            let path = cache.weekly_path(year, ds, &w.season_type, w.week);
+            let fetched_at = fs::metadata(&path)
+                .and_then(|m| m.modified())
+                .ok()
+                .map(unix);
+            if !week_needs_fetch(refresh, now, first, last.map(|t| t + 86_400), fetched_at) {
+                continue;
+            }
+            let body = self.get(ds.path(), &ds.query(year, &w.season_type, w.week))?;
+            calls += 1;
+            let value: serde_json::Value = serde_json::from_str(&body).with_context(|| {
+                format!("{} {year} week {}: response is not JSON", ds.path(), w.week)
+            })?;
+            if !value.is_array() {
+                bail!(
+                    "{} {year} week {}: expected a JSON array, got {}",
+                    ds.path(),
+                    w.week,
+                    truncate(&body)
+                );
+            }
+            cache.store_weekly(year, ds, &w.season_type, w.week, &body)?;
+        }
+        Ok(calls)
+    }
+
     pub fn info(&self) -> Result<UserInfo> {
         let body = self.get("/info", &[])?;
         serde_json::from_str(&body).context("parsing /info")
@@ -239,7 +400,40 @@ fn truncate(s: &str) -> &str {
 
 #[cfg(test)]
 mod tests {
-    use super::dotenv_value;
+    use super::{dotenv_value, iso_seconds, week_needs_fetch, Refresh};
+    use std::time::Duration;
+
+    #[test]
+    fn iso_timestamps() {
+        assert_eq!(iso_seconds("1970-01-01T00:00:00.000Z"), Some(0));
+        assert_eq!(iso_seconds("2025-09-02T06:59:00.000Z"), Some(1_756_796_340));
+        assert_eq!(iso_seconds("2025-09"), None);
+    }
+
+    #[test]
+    fn weekly_refetch_rule() {
+        let live = Refresh::OlderThan(Duration::from_secs(3600));
+        // A future week is never fetched, even when absent.
+        assert!(!week_needs_fetch(live, 100, Some(200), Some(300), None));
+        // A started week fetched before it went final is refetched once.
+        assert!(week_needs_fetch(live, 400, Some(50), Some(300), Some(250)));
+        assert!(!week_needs_fetch(live, 400, Some(50), Some(300), Some(350)));
+        // Completed seasons only fill gaps.
+        assert!(!week_needs_fetch(
+            Refresh::Missing,
+            400,
+            Some(50),
+            Some(300),
+            Some(250)
+        ));
+        assert!(week_needs_fetch(
+            Refresh::Missing,
+            400,
+            Some(50),
+            Some(300),
+            None
+        ));
+    }
 
     #[test]
     fn dotenv_parsing() {

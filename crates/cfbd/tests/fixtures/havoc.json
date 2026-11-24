@@ -1,0 +1,58 @@
+[
+ {
+  "gameId": 401628319,
+  "season": 2024,
+  "seasonType": "regular",
+  "week": 1,
+  "team": "Western Kentucky",
+  "conference": "CUSA",
+  "opponent": "Alabama",
+  "opponentConference": "SEC",
+  "offense": {
+   "totalPlays": 67,
+   "totalHavocEvents": 17,
+   "frontSevenHavocEvents": 7,
+   "dbHavocEvents": 10,
+   "havocRate": 0.2537313432835821,
+   "frontSevenHavocRate": 0.1044776119402985,
+   "dbHavocRate": 0.14925373134328357
+  },
+  "defense": {
+   "totalPlays": 65,
+   "totalHavocEvents": 6,
+   "frontSevenHavocEvents": 5,
+   "dbHavocEvents": 1,
+   "havocRate": 0.09230769230769231,
+   "frontSevenHavocRate": 0.07692307692307693,
+   "dbHavocRate": 0.015384615384615385
+  }
+ },
+ {
+  "gameId": 401628319,
+  "season": 2024,
+  "seasonType": "regular",
+  "week": 1,
+  "team": "Alabama",
+  "conference": "SEC",
+  "opponent": "Western Kentucky",
+  "opponentConference": "CUSA",
+  "offense": {
+   "totalPlays": 65,
+   "totalHavocEvents": 6,
+   "frontSevenHavocEvents": 5,
+   "dbHavocEvents": 1,
+   "havocRate": 0.09230769230769231,
+   "frontSevenHavocRate": 0.07692307692307693,
+   "dbHavocRate": 0.015384615384615385
+  },
+  "defense": {
+   "totalPlays": 67,
+   "totalHavocEvents": 17,
+   "frontSevenHavocEvents": 7,
+   "dbHavocEvents": 10,
+   "havocRate": 0.2537313432835821,
+   "frontSevenHavocRate": 0.1044776119402985,
+   "dbHavocRate": 0.14925373134328357
+  }
+ }
+]

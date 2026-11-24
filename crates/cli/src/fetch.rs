@@ -2,7 +2,7 @@
 
 use crate::season::current_season;
 use anyhow::Result;
-use cfbd::{Cache, Client, Dataset, Refresh};
+use cfbd::{Cache, Client, Dataset, Refresh, WeeklyDataset};
 use std::time::Duration;
 
 /// Completed seasons are fetched once; the current season's in-season
@@ -22,8 +22,15 @@ pub fn run(cache: &Cache, years: &[i32], stale_hours: u64, force: bool) -> Resul
         };
         let fetched = client.sync(cache, year, &Dataset::ALL, refresh)?;
         calls += fetched.len();
-        if !fetched.is_empty() {
-            let names: Vec<_> = fetched.iter().map(|d| d.file_name()).collect();
+        let mut names: Vec<String> = fetched.iter().map(|d| d.file_name().to_string()).collect();
+        for ds in WeeklyDataset::ALL {
+            let n = client.sync_weekly(cache, year, ds, refresh)?;
+            calls += n;
+            if n > 0 {
+                names.push(format!("{} ({n} weeks)", ds.dir()));
+            }
+        }
+        if !names.is_empty() {
             eprintln!("{year}: fetched {}", names.join(", "));
         }
     }

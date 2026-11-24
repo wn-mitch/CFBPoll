@@ -20,10 +20,18 @@ pub enum Dataset {
     Roster,
     Talent,
     Calendar,
+    /// Garbage-time-excluded per-game advanced team stats: success rate,
+    /// explosiveness, rush and pass splits.
+    Advanced,
+    /// Per-game havoc rates (tackles for loss, passes defended, forced
+    /// fumbles per play).
+    Havoc,
+    /// Head coaches with their seasons by school.
+    Coaches,
 }
 
 impl Dataset {
-    pub const ALL: [Dataset; 11] = [
+    pub const ALL: [Dataset; 14] = [
         Dataset::GamesFbs,
         Dataset::GamesFcs,
         Dataset::PpaFbs,
@@ -35,6 +43,9 @@ impl Dataset {
         Dataset::Roster,
         Dataset::Talent,
         Dataset::Calendar,
+        Dataset::Advanced,
+        Dataset::Havoc,
+        Dataset::Coaches,
     ];
 
     /// Datasets that change while a season is in progress. The rest are
@@ -50,6 +61,9 @@ impl Dataset {
                 | Dataset::Rankings
                 | Dataset::Portal
                 | Dataset::Roster
+                | Dataset::Advanced
+                | Dataset::Havoc
+                | Dataset::Coaches
         )
     }
 
@@ -66,6 +80,9 @@ impl Dataset {
             Dataset::Roster => "roster.json",
             Dataset::Talent => "talent.json",
             Dataset::Calendar => "calendar.json",
+            Dataset::Advanced => "advanced.json",
+            Dataset::Havoc => "havoc.json",
+            Dataset::Coaches => "coaches.json",
         }
     }
 
@@ -80,6 +97,9 @@ impl Dataset {
             Dataset::Roster => "/roster",
             Dataset::Talent => "/talent",
             Dataset::Calendar => "/calendar",
+            Dataset::Advanced => "/stats/game/advanced",
+            Dataset::Havoc => "/stats/game/havoc",
+            Dataset::Coaches => "/coaches",
         }
     }
 
@@ -100,14 +120,57 @@ impl Dataset {
                 ("excludeGarbageTime", "true".into()),
                 ("classification", "fcs".into()),
             ]),
-            Dataset::Lines | Dataset::Rankings => q.push(both),
+            Dataset::Lines | Dataset::Rankings | Dataset::Havoc => q.push(both),
+            Dataset::Advanced => q.extend([both, ("excludeGarbageTime", "true".into())]),
             Dataset::Returning
             | Dataset::Portal
             | Dataset::Roster
             | Dataset::Talent
-            | Dataset::Calendar => {}
+            | Dataset::Calendar
+            | Dataset::Coaches => {}
         }
         q
+    }
+}
+
+/// A dataset the API serves only one week at a time. Each week is cached in
+/// its own file under `data/raw/<year>/<dir>/`, so a refresh refetches only
+/// weeks that were incomplete when last fetched.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum WeeklyDataset {
+    /// Passing box scores for games with an FBS team; used to find each
+    /// team's starting quarterback.
+    PassingFbs,
+    /// Passing box scores for games with an FCS team.
+    PassingFcs,
+}
+
+impl WeeklyDataset {
+    pub const ALL: [WeeklyDataset; 2] = [WeeklyDataset::PassingFbs, WeeklyDataset::PassingFcs];
+
+    pub fn dir(self) -> &'static str {
+        match self {
+            WeeklyDataset::PassingFbs => "passing_fbs",
+            WeeklyDataset::PassingFcs => "passing_fcs",
+        }
+    }
+
+    pub fn path(self) -> &'static str {
+        "/games/players"
+    }
+
+    pub fn query(self, year: i32, season_type: &str, week: i32) -> Vec<(&'static str, String)> {
+        let class = match self {
+            WeeklyDataset::PassingFbs => "fbs",
+            WeeklyDataset::PassingFcs => "fcs",
+        };
+        vec![
+            ("year", year.to_string()),
+            ("week", week.to_string()),
+            ("seasonType", season_type.to_string()),
+            ("category", "passing".into()),
+            ("classification", class.into()),
+        ]
     }
 }
 
@@ -132,8 +195,21 @@ mod tests {
     }
 
     #[test]
+    fn advanced_stats_exclude_garbage_time() {
+        assert!(Dataset::Advanced
+            .query(2024)
+            .contains(&("excludeGarbageTime", "true".into())));
+    }
+
+    #[test]
     fn game_queries_include_postseason() {
-        for d in [Dataset::GamesFbs, Dataset::GamesFcs, Dataset::Lines] {
+        for d in [
+            Dataset::GamesFbs,
+            Dataset::GamesFcs,
+            Dataset::Lines,
+            Dataset::Advanced,
+            Dataset::Havoc,
+        ] {
             assert!(d.query(2024).contains(&("seasonType", "both".into())));
         }
     }

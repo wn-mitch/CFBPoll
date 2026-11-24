@@ -165,6 +165,141 @@ pub struct CalendarWeek {
     pub season_type: String,
     pub start_date: String,
     pub end_date: String,
+    pub first_game_start: Option<String>,
+    pub last_game_start: Option<String>,
+}
+
+/// `/stats/game/advanced` row: one team's offense and defense in one game.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TeamGameAdvanced {
+    pub game_id: i64,
+    pub team: String,
+    pub opponent: String,
+    pub offense: AdvancedSide,
+}
+
+/// One unit's per-play rates in a game. Rates are `None` when the unit ran
+/// no plays of that kind.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AdvancedSide {
+    pub plays: Option<f64>,
+    pub ppa: Option<f64>,
+    pub success_rate: Option<f64>,
+    pub explosiveness: Option<f64>,
+    pub line_yards: Option<f64>,
+    pub stuff_rate: Option<f64>,
+    pub rushing_plays: PhaseRates,
+    pub passing_plays: PhaseRates,
+    pub passing_downs: PhaseRates,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PhaseRates {
+    pub ppa: Option<f64>,
+    pub success_rate: Option<f64>,
+    pub explosiveness: Option<f64>,
+}
+
+/// `/stats/game/havoc` row. `offense` is the havoc the team's offense
+/// allowed; `defense` is the havoc its defense created.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TeamGameHavoc {
+    pub game_id: i64,
+    pub team: String,
+    pub offense: HavocSide,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct HavocSide {
+    pub total_plays: Option<f64>,
+    pub havoc_rate: Option<f64>,
+}
+
+/// `/coaches` row: one head coach and every season they coached.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Coach {
+    pub first_name: String,
+    pub last_name: String,
+    pub hire_date: Option<String>,
+    pub seasons: Vec<CoachSeason>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CoachSeason {
+    pub school: String,
+    pub year: i32,
+    pub games: Option<i32>,
+}
+
+/// `/games/players` row: box-score player stats for one game.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GamePlayers {
+    pub id: i64,
+    pub teams: Vec<TeamPlayers>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TeamPlayers {
+    pub team: String,
+    pub categories: Vec<StatCategory>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct StatCategory {
+    pub name: String,
+    pub types: Vec<StatType>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct StatType {
+    pub name: String,
+    pub athletes: Vec<AthleteStat>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct AthleteStat {
+    pub id: String,
+    pub name: String,
+    pub stat: String,
+}
+
+impl GamePlayers {
+    /// Each team's passer with the most attempts (`C/ATT`), as `(team,
+    /// athlete id)`; ties go to more completions, then to the passer listed
+    /// first. Team-total rows (non-positive ids) and teams with no attempt
+    /// are skipped.
+    pub fn starting_passers(&self) -> Vec<(String, String)> {
+        self.teams
+            .iter()
+            .filter_map(|t| {
+                let (_, _, _, id) = t
+                    .categories
+                    .iter()
+                    .filter(|c| c.name == "passing")
+                    .flat_map(|c| &c.types)
+                    .filter(|ty| ty.name == "C/ATT")
+                    .flat_map(|ty| &ty.athletes)
+                    .enumerate()
+                    .filter_map(|(i, a)| {
+                        let (c, n) = a.stat.split_once('/')?;
+                        let (c, n): (i32, i32) = (c.trim().parse().ok()?, n.trim().parse().ok()?);
+                        let real = a.id.parse::<i64>().is_ok_and(|id| id > 0);
+                        (n > 0 && real).then_some((n, c, std::cmp::Reverse(i), &a.id))
+                    })
+                    .max()?;
+                Some((t.team.clone(), id.clone()))
+            })
+            .collect()
+    }
 }
 
 /// `/info` response.

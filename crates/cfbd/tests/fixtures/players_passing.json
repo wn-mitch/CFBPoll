@@ -1,0 +1,429 @@
+[
+ {
+  "id": 401645335,
+  "teams": [
+   {
+    "team": "Wagner",
+    "conference": "NEC",
+    "homeAway": "away",
+    "points": 10,
+    "categories": [
+     {
+      "name": "passing",
+      "types": [
+       {
+        "name": "C/ATT",
+        "athletes": [
+         {
+          "id": "5095499",
+          "name": "Jacob Cady",
+          "stat": "11/30"
+         },
+         {
+          "id": "4870601",
+          "name": "Jaylen Bonelli",
+          "stat": "0/1"
+         },
+         {
+          "id": "5227302",
+          "name": "Jack Stevens",
+          "stat": "0/1"
+         }
+        ]
+       },
+       {
+        "name": "YDS",
+        "athletes": [
+         {
+          "id": "5095499",
+          "name": "Jacob Cady",
+          "stat": "112"
+         },
+         {
+          "id": "4870601",
+          "name": "Jaylen Bonelli",
+          "stat": "0"
+         },
+         {
+          "id": "5227302",
+          "name": "Jack Stevens",
+          "stat": "0"
+         }
+        ]
+       },
+       {
+        "name": "AVG",
+        "athletes": [
+         {
+          "id": "5095499",
+          "name": "Jacob Cady",
+          "stat": "3.7"
+         },
+         {
+          "id": "4870601",
+          "name": "Jaylen Bonelli",
+          "stat": "0.0"
+         },
+         {
+          "id": "5227302",
+          "name": "Jack Stevens",
+          "stat": "0.0"
+         }
+        ]
+       },
+       {
+        "name": "TD",
+        "athletes": [
+         {
+          "id": "5095499",
+          "name": "Jacob Cady",
+          "stat": "1"
+         },
+         {
+          "id": "4870601",
+          "name": "Jaylen Bonelli",
+          "stat": "0"
+         },
+         {
+          "id": "5227302",
+          "name": "Jack Stevens",
+          "stat": "0"
+         }
+        ]
+       },
+       {
+        "name": "INT",
+        "athletes": [
+         {
+          "id": "5095499",
+          "name": "Jacob Cady",
+          "stat": "0"
+         },
+         {
+          "id": "4870601",
+          "name": "Jaylen Bonelli",
+          "stat": "0"
+         },
+         {
+          "id": "5227302",
+          "name": "Jack Stevens",
+          "stat": "0"
+         }
+        ]
+       },
+       {
+        "name": "QBR",
+        "athletes": [
+         {
+          "id": "5095499",
+          "name": "Jacob Cady",
+          "stat": "--"
+         },
+         {
+          "id": "4870601",
+          "name": "Jaylen Bonelli",
+          "stat": "--"
+         },
+         {
+          "id": "5227302",
+          "name": "Jack Stevens",
+          "stat": "--"
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "team": "Florida Atlantic",
+    "conference": "American Athletic",
+    "homeAway": "home",
+    "points": 41,
+    "categories": [
+     {
+      "name": "passing",
+      "types": [
+       {
+        "name": "C/ATT",
+        "athletes": [
+         {
+          "id": "4700135",
+          "name": "Cam Fancher",
+          "stat": "9/12"
+         },
+         {
+          "id": "4954456",
+          "name": "Kasen Weisman",
+          "stat": "7/12"
+         },
+         {
+          "id": "5125301",
+          "name": "Carson Cruver",
+          "stat": "1/1"
+         }
+        ]
+       },
+       {
+        "name": "YDS",
+        "athletes": [
+         {
+          "id": "4700135",
+          "name": "Cam Fancher",
+          "stat": "150"
+         },
+         {
+          "id": "4954456",
+          "name": "Kasen Weisman",
+          "stat": "98"
+         },
+         {
+          "id": "5125301",
+          "name": "Carson Cruver",
+          "stat": "9"
+         }
+        ]
+       },
+       {
+        "name": "AVG",
+        "athletes": [
+         {
+          "id": "4700135",
+          "name": "Cam Fancher",
+          "stat": "12.5"
+         },
+         {
+          "id": "4954456",
+          "name": "Kasen Weisman",
+          "stat": "8.2"
+         },
+         {
+          "id": "5125301",
+          "name": "Carson Cruver",
+          "stat": "9.0"
+         }
+        ]
+       },
+       {
+        "name": "TD",
+        "athletes": [
+         {
+          "id": "4700135",
+          "name": "Cam Fancher",
+          "stat": "0"
+         },
+         {
+          "id": "4954456",
+          "name": "Kasen Weisman",
+          "stat": "0"
+         },
+         {
+          "id": "5125301",
+          "name": "Carson Cruver",
+          "stat": "0"
+         }
+        ]
+       },
+       {
+        "name": "INT",
+        "athletes": [
+         {
+          "id": "4700135",
+          "name": "Cam Fancher",
+          "stat": "1"
+         },
+         {
+          "id": "4954456",
+          "name": "Kasen Weisman",
+          "stat": "1"
+         },
+         {
+          "id": "5125301",
+          "name": "Carson Cruver",
+          "stat": "0"
+         }
+        ]
+       },
+       {
+        "name": "QBR",
+        "athletes": [
+         {
+          "id": "4700135",
+          "name": "Cam Fancher",
+          "stat": "49.5"
+         },
+         {
+          "id": "4954456",
+          "name": "Kasen Weisman",
+          "stat": "16.7"
+         },
+         {
+          "id": "5125301",
+          "name": "Carson Cruver",
+          "stat": "98.9"
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": 401633982,
+  "teams": [
+   {
+    "team": "Lindenwood",
+    "conference": "Big South-OVC",
+    "homeAway": "away",
+    "points": 28,
+    "categories": [
+     {
+      "name": "passing",
+      "types": [
+       {
+        "name": "C/ATT",
+        "athletes": [
+         {
+          "id": "5081856",
+          "name": "Nate Glantz",
+          "stat": "14/19"
+         }
+        ]
+       },
+       {
+        "name": "YDS",
+        "athletes": [
+         {
+          "id": "5081856",
+          "name": "Nate Glantz",
+          "stat": "283"
+         }
+        ]
+       },
+       {
+        "name": "AVG",
+        "athletes": [
+         {
+          "id": "5081856",
+          "name": "Nate Glantz",
+          "stat": "14.9"
+         }
+        ]
+       },
+       {
+        "name": "TD",
+        "athletes": [
+         {
+          "id": "5081856",
+          "name": "Nate Glantz",
+          "stat": "4"
+         }
+        ]
+       },
+       {
+        "name": "INT",
+        "athletes": [
+         {
+          "id": "5081856",
+          "name": "Nate Glantz",
+          "stat": "1"
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "team": "Eastern Illinois",
+    "conference": "Big South-OVC",
+    "homeAway": "home",
+    "points": 25,
+    "categories": [
+     {
+      "name": "passing",
+      "types": [
+       {
+        "name": "C/ATT",
+        "athletes": [
+         {
+          "id": "4571721",
+          "name": "Pierce Holley",
+          "stat": "26/43"
+         },
+         {
+          "id": "-5869",
+          "name": " Team",
+          "stat": "0/1"
+         }
+        ]
+       },
+       {
+        "name": "YDS",
+        "athletes": [
+         {
+          "id": "4571721",
+          "name": "Pierce Holley",
+          "stat": "326"
+         },
+         {
+          "id": "-5869",
+          "name": " Team",
+          "stat": "0"
+         }
+        ]
+       },
+       {
+        "name": "AVG",
+        "athletes": [
+         {
+          "id": "4571721",
+          "name": "Pierce Holley",
+          "stat": "7.6"
+         },
+         {
+          "id": "-5869",
+          "name": " Team",
+          "stat": "0.0"
+         }
+        ]
+       },
+       {
+        "name": "TD",
+        "athletes": [
+         {
+          "id": "4571721",
+          "name": "Pierce Holley",
+          "stat": "2"
+         },
+         {
+          "id": "-5869",
+          "name": " Team",
+          "stat": "0"
+         }
+        ]
+       },
+       {
+        "name": "INT",
+        "athletes": [
+         {
+          "id": "4571721",
+          "name": "Pierce Holley",
+          "stat": "0"
+         },
+         {
+          "id": "-5869",
+          "name": " Team",
+          "stat": "0"
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+]
