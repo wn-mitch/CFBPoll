@@ -17,7 +17,18 @@ pub struct Finals {
     pub class: HashMap<String, Class>,
 }
 
+/// Prior sd of conference levels in fresh-start runs. The fitted `conf_sd`
+/// suits runs with a roster prior, where conference levels only correct
+/// it; a fresh start needs them to carry the whole gap between conferences,
+/// and shrinking them toward zero taught the prior to underrate strong
+/// conferences. Backtests are flat from 9 to 30, so any wide value works.
+const FRESH_CONF_SD: f64 = 10.0;
+
 pub fn fresh_finals(season: &Season, params: &Params) -> Finals {
+    let params = &Params {
+        conf_sd: FRESH_CONF_SD,
+        ..params.clone()
+    };
     let run = run_season(season, params, &RunOptions::default());
     let r = run.final_ratings();
     let fbs: Vec<usize> = (0..season.teams.len())
@@ -110,6 +121,7 @@ impl Offseason {
         Features {
             fcs: class == Class::Fcs,
             prev,
+            conf_prev: None,
             returning_ppa: r.map(|r| {
                 [
                     r.percent_ppa,
@@ -188,13 +200,26 @@ pub fn season_features(
     off: &Offseason,
     prev: Option<&Finals>,
 ) -> Vec<Option<Features>> {
+    let last = |name: &str| prev.and_then(|f| f.ratings.get(name).copied());
+    let mut conf: HashMap<&str, (f64, f64, f64)> = HashMap::new();
+    for t in season.teams.iter().filter(|t| t.class.is_rated()) {
+        if let (Some(c), Some((o, d))) = (t.conference.as_deref(), last(&t.name)) {
+            let e = conf.entry(c).or_default();
+            *e = (e.0 + o, e.1 + d, e.2 + 1.0);
+        }
+    }
     season
         .teams
         .iter()
         .map(|t| {
             t.class.is_rated().then(|| {
-                let p = prev.and_then(|f| f.ratings.get(&t.name).copied());
-                off.features(&t.name, t.class, p)
+                let mut f = off.features(&t.name, t.class, last(&t.name));
+                f.conf_prev = t
+                    .conference
+                    .as_deref()
+                    .and_then(|c| conf.get(c))
+                    .map(|&(o, d, n)| (o / n, d / n));
+                f
             })
         })
         .collect()

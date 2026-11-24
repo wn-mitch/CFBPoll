@@ -33,6 +33,11 @@ pub struct Features {
     /// Last season's fresh-start end-of-season offense and defense; `None`
     /// when the team was not rated last season.
     pub prev: Option<(f64, f64)>,
+    /// Mean of `prev` over this season's conference mates (the team
+    /// included); `None` for independents. Conference strength persists
+    /// more than a team's own deviation from it.
+    #[serde(default)]
+    pub conf_prev: Option<(f64, f64)>,
     /// Returning share of last season's PPA: total, passing, rushing, receiving.
     pub returning_ppa: Option<[f64; 4]>,
     /// Returning share of usage: total, passing, rushing, receiving.
@@ -68,11 +73,14 @@ impl Blocks {
 /// imputed with the training mean, so they contribute nothing.
 fn raw(f: &Features, b: Blocks) -> Vec<Option<f64>> {
     let (po, pd) = f.prev.unzip();
+    let (co, cd) = f.conf_prev.unzip();
     let mut v = vec![
         Some(if f.fcs { 1.0 } else { 0.0 }),
         Some(if f.prev.is_some() { 1.0 } else { 0.0 }),
         po,
         pd,
+        co,
+        cd,
     ];
     if b.returning {
         let r = f.returning_ppa;

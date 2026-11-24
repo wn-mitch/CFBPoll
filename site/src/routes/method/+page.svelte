@@ -64,7 +64,7 @@
 			!data.prior.blocks.talent && 'the recruiting talent composite'
 		].filter(Boolean)}
 		<p>
-			A team starts each season from last season's rating{kept.length ? `, adjusted for ${kept.join(' and ')}` : ''}.
+			A team starts each season from last season's rating and its conference's average rating{kept.length ? `, adjusted for ${kept.join(' and ')}` : ''}.
 			The weights come from a regression on {data.prior.train_years[0]}–{data.prior.train_years[data.prior.train_years.length - 1]}
 			seasons, not from reputation or polls. {#if dropped.length}We also tested {dropped.join(', ')}; none improved
 				accuracy, so they are not used.{/if} Starting uncertainty is wide (about ±{(
